@@ -23,6 +23,7 @@ final class OnboardingState: ObservableObject {
 struct OnboardingView: View {
     @StateObject var onboardingState = OnboardingState()
     @EnvironmentObject var appModel: AppModel
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding = false
 
     var body: some View {
         ZStack {
@@ -38,6 +39,9 @@ struct OnboardingView: View {
 
             case .complete:
                 ContentView()
+                    .onAppear {
+                        hasSeenOnboarding = true
+                    }
             }
         }
     }
@@ -120,42 +124,6 @@ struct LocationPermissionView: View {
     }
 }
 
-// MARK: - Placeholder ContactPickerView
-
-struct ContactPickerView: View {
-    @ObservedObject var onboardingState: OnboardingState
-
-    var body: some View {
-        ZStack {
-            Color.white
-                .ignoresSafeArea()
-
-            VStack {
-                Text("Seleccionar contactos")
-                    .font(.title2)
-                    .foregroundStyle(.primary)
-
-                Spacer()
-
-                Button(action: {
-                    onboardingState.step = .locationPermission
-                }) {
-                    Text("Continuar")
-                        .font(.system(size: 16, weight: .semibold, design: .default))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color(red: 0.0, green: 0.45, blue: 0.90))
-                        .cornerRadius(12)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 16)
-        }
-    }
-}
 
 #Preview {
     OnboardingView()
