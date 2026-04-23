@@ -74,12 +74,8 @@ create index if not exists viewer_tokens_token_user_id_idx
 
 alter table public.viewer_tokens enable row level security;
 
--- viewer_tokens RLS: public can read by token, users can write own rows
-create policy "Public read viewer_tokens by token"
-    on public.viewer_tokens
-    for select
-    to public
-    using (true);
+-- viewer_tokens RLS: users can write own rows (app backend reads, not public)
+-- Note: public read is intentionally restricted — tokens are private credentials
 
 create policy "Users insert own viewer_tokens"
     on public.viewer_tokens
@@ -118,10 +114,5 @@ create policy "Public read location_pings via valid viewer token"
     for select
     to public
     using (
-        exists (
-            select 1
-            from public.viewer_tokens vt
-            where vt.user_id = location_pings.user_id
-              and vt.token = current_setting('app.viewer_token', true)::text
-        )
+        is_valid_viewer_token(user_id, current_setting('request.headers')::json->>'x-viewer-token')
     );
