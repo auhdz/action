@@ -15,6 +15,7 @@
 		781950D02E06B9C0F3205080 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129ED7A23C191BE49F4BCF7B /* LocationManager.swift */; };
 		DF2F30E24291CE9517288129 /* LocationSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3F3C46F092B0C1FB3A2F2D /* LocationSyncService.swift */; };
 		737A47BF4C81D637B6CBDB8B /* MapAnnotationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F7324DC4FA9EBCE13F12EE /* MapAnnotationProvider.swift */; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* ViewerTokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* ViewerTokenService.swift */; };
 		73B9AB324CE3DF8A3C94D951 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5163EBDF6E51B1085349824B /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 		129ED7A23C191BE49F4BCF7B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		DC3F3C46F092B0C1FB3A2F2D /* LocationSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSyncService.swift; sourceTree = "<group>"; };
 		19F7324DC4FA9EBCE13F12EE /* MapAnnotationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAnnotationProvider.swift; sourceTree = "<group>"; };
+		B2C3D4E5F6A7B8C9D0E1F2A3 /* ViewerTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerTokenService.swift; sourceTree = "<group>"; };
 		35C3103AAB6A8C21CAA83F60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5163EBDF6E51B1085349824B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2AFFBAEE02FEA66CB172A56B /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				DC3F3C46F092B0C1FB3A2F2D /* LocationSyncService.swift */,
+				B2C3D4E5F6A7B8C9D0E1F2A3 /* ViewerTokenService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -209,6 +212,7 @@
 				781950D02E06B9C0F3205080 /* LocationManager.swift in Sources */,
 				DF2F30E24291CE9517288129 /* LocationSyncService.swift in Sources */,
 				737A47BF4C81D637B6CBDB8B /* MapAnnotationProvider.swift in Sources */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* ViewerTokenService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
