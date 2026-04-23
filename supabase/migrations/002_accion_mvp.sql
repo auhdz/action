@@ -96,6 +96,8 @@ create policy "Users delete own viewer_tokens"
 create or replace function public.is_valid_viewer_token(p_user_id uuid, p_token text)
 returns boolean as $$
 begin
+    -- Relies on unique index on token column for O(1) lookup performance.
+    -- The combination of user_id and token uniqueness ensures fast, deterministic lookups.
     return exists(
         select 1
         from public.viewer_tokens
@@ -108,6 +110,13 @@ $$ language plpgsql stable;
 -- ============================================================================
 -- 5. Add viewer token policy to location_pings
 -- ============================================================================
+
+-- Viewer token is passed via request header (x-viewer-token) to avoid logging tokens in URLs.
+-- This header-based approach prevents tokens from appearing in browser history, proxy logs,
+-- or server access logs, which would expose sensitive credentials.
+-- Tokens are treated as opaque credentials — do not share in URLs directly.
+-- The client (web viewer) extracts the token from the shareable URL and passes it as a
+-- secure request header, using only the token value without exposing it in the path.
 
 create policy "Public read location_pings via valid viewer token"
     on public.location_pings
