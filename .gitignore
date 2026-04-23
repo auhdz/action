@@ -1,0 +1,11 @@
+# Local Supabase secrets (copy from Secrets.example.xcconfig)
+ios/Action/Config/Secrets.xcconfig
+
+# Xcode
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+
+# SwiftPM
+.build/
+.swiftpm/
