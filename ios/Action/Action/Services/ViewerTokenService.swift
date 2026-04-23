@@ -18,16 +18,12 @@ struct ViewerTokenRow: Codable {
 final class ViewerTokenService: ObservableObject {
     @Published var viewerToken: String?
     @Published var isLoading = false
+    @Published var lastError: String?
 
-    private let configuration: AppConfiguration
-    private let supabase: SupabaseClient
+    private let supabaseClient: SupabaseClient
 
-    init(configuration: AppConfiguration) {
-        self.configuration = configuration
-        self.supabase = SupabaseClient(
-            supabaseURL: configuration.supabaseURL,
-            supabaseKey: configuration.supabaseAnonKey
-        )
+    init(supabaseClient: SupabaseClient) {
+        self.supabaseClient = supabaseClient
     }
 
     // MARK: - Public Methods
@@ -41,11 +37,11 @@ final class ViewerTokenService: ObservableObject {
             try await ensureAnonymousSessionIfNeeded()
 
             // Get the current user ID
-            let session = try await supabase.auth.session
+            let session = try await supabaseClient.auth.session
             let userId = session.user.id.uuidString
 
             // Query for existing token
-            let response = try await supabase
+            let response = try await supabaseClient
                 .from("viewer_tokens")
                 .select()
                 .eq("user_id", value: userId)
@@ -61,7 +57,7 @@ final class ViewerTokenService: ObservableObject {
             } else {
                 // Token doesn't exist, insert a new one with generated token
                 let newToken = generateSecureToken()
-                let insertResponse = try await supabase
+                let insertResponse = try await supabaseClient
                     .from("viewer_tokens")
                     .insert(["user_id": userId, "token": newToken])
                     .select()
@@ -72,10 +68,7 @@ final class ViewerTokenService: ObservableObject {
                 viewerToken = newRow.token
             }
         } catch {
-            // Silently handle errors
-            #if DEBUG
-            print("ViewerTokenService error: \(error.localizedDescription)")
-            #endif
+            lastError = "Failed to get viewer token: \(error.localizedDescription)"
         }
     }
 
@@ -95,16 +88,12 @@ final class ViewerTokenService: ObservableObject {
 
     private func ensureAnonymousSessionIfNeeded() async throws {
         do {
-            _ = try await supabase.auth.session
+            _ = try await supabaseClient.auth.session
             return
         } catch {
             // No session; try anonymous sign-in.
         }
 
-        do {
-            _ = try await supabase.auth.signInAnonymously()
-        } catch {
-            throw error
-        }
+        _ = try await supabaseClient.auth.signInAnonymously()
     }
 }

@@ -5,7 +5,16 @@
       "Bash(gh repo *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(cat)",
+      "Bash(bash /tmp/test_syntax.sql)",
+      "Bash(xcodebuild -scheme Action -configuration Debug -destination 'generic/platform=iOS Simulator' build)",
+      "Bash(xcodebuild -project ios/Action/Action.xcodeproj -scheme Action -configuration Debug -sdk iphonesimulator -destination generic/platform=iOS -showBuildSettings)",
+      "Bash(swiftc *)",
+      "Bash(xcodebuild -scheme Action -configuration Debug -destination \"platform=iOS Simulator,name=iPhone 15\" build)",
+      "Bash(swift -parse /Users/ahernandez5/action/ios/Action/Action/Services/ViewerTokenService.swift)",
+      "Bash(xcodebuild build *)",
+      "Bash(xcodebuild *)"
     ]
   }
 }
