@@ -79,9 +79,7 @@ struct LocationPermissionView: View {
                 VStack(spacing: 12) {
                     Button(action: {
                         appModel.locationManager.requestAuthorizationIfNeeded()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            onboardingState.step = .complete
-                        }
+                        onboardingState.step = .complete
                     }) {
                         Text("Permitir ubicación")
                             .font(.system(size: 16, weight: .semibold, design: .default))
@@ -122,7 +120,7 @@ struct ContactPickerView: View {
                 .ignoresSafeArea()
 
             VStack {
-                Text("Select Contacts")
+                Text("Seleccionar contactos")
                     .font(.title2)
                     .foregroundStyle(.primary)
 
@@ -131,7 +129,7 @@ struct ContactPickerView: View {
                 Button(action: {
                     onboardingState.step = .locationPermission
                 }) {
-                    Text("Continue")
+                    Text("Continuar")
                         .font(.system(size: 16, weight: .semibold, design: .default))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
