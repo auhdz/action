@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Action — preview</title>
+  <title>Acción — Visor</title>
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -13,6 +13,7 @@
   <style>
     :root {
       --accent: rgb(0, 115, 230);
+      --alert: #ff3b30;
       --text: #000;
       --secondary: rgba(60, 60, 67, 0.6);
       --tertiary: rgba(60, 60, 67, 0.3);
@@ -32,16 +33,44 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    body.alert-active {
+      background: var(--alert);
+    }
+
     .phone {
       max-width: 430px;
       min-height: 100%;
       margin: 0 auto;
       position: relative;
       background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.alert-active .phone {
+      background: var(--alert);
+    }
+
+    .alert-banner {
+      display: none;
+      background: var(--alert);
+      color: #fff;
+      padding: 12px 24px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    body.alert-active .alert-banner {
+      display: block;
     }
 
     .content {
       padding: 16px 24px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     h1 {
@@ -57,6 +86,11 @@
       font-size: 15px;
       line-height: 1.35;
       color: var(--secondary);
+    }
+
+    body.alert-active .subtitle {
+      color: #fff;
+      opacity: 0.9;
     }
 
     .status {
@@ -75,6 +109,10 @@
       color: var(--secondary);
     }
 
+    body.alert-active .status-row {
+      color: #fff;
+    }
+
     .dot {
       width: 8px;
       height: 8px;
@@ -83,8 +121,21 @@
       flex-shrink: 0;
     }
 
-    .dot.warn { background: #ff9500; }
-    .dot.muted { background: #c7c7cc; }
+    .dot.alert {
+      background: var(--alert);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.4;
+        transform: scale(1.2);
+      }
+    }
 
     .detail {
       font-size: 12px;
@@ -92,11 +143,19 @@
       padding-left: 16px;
     }
 
+    body.alert-active .detail {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
     .hint {
       margin-top: 32px;
       font-size: 12px;
       color: var(--tertiary);
       line-height: 1.5;
+    }
+
+    body.alert-active .hint {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     .map-card {
@@ -113,6 +172,11 @@
       background: #e8e8ed;
     }
 
+    body.alert-active .map-card {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
     .map-card #map {
       width: 100%;
       height: 100%;
@@ -122,28 +186,82 @@
       font-size: 9px !important;
       background: rgba(255, 255, 255, 0.85) !important;
     }
+
+    .error-state {
+      display: none;
+      padding: 16px 24px;
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      margin: 16px 0;
+      border-radius: 8px;
+    }
+
+    .error-state.show {
+      display: block;
+    }
+
+    .error-state h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #856404;
+    }
+
+    .error-state p {
+      margin: 0;
+      font-size: 12px;
+      color: #856404;
+    }
+
+    @media (max-width: 480px) {
+      .phone {
+        max-width: 100%;
+      }
+
+      .content {
+        padding: 12px 16px 16px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .map-card {
+        width: 140px;
+        height: 120px;
+        top: 12px;
+        right: 12px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="phone">
+    <div class="alert-banner">ALERTA ACTIVADA</div>
+
     <div class="map-card" aria-label="Map preview">
       <div id="map"></div>
     </div>
 
     <div class="content">
-      <h1>Action</h1>
-      <p class="subtitle">Your corner map and live ping status.</p>
+      <h1>Acción</h1>
+      <p class="subtitle" id="subtitle">Cargando ubicación…</p>
+
+      <div class="error-state" id="errorState">
+        <h3 id="errorTitle">Error</h3>
+        <p id="errorMessage">An error occurred.</p>
+      </div>
 
       <div class="status">
         <div class="status-row">
           <span class="dot" id="statusDot"></span>
-          <span id="statusTitle">Location…</span>
+          <span id="statusTitle">Cargando…</span>
         </div>
-        <div class="detail" id="statusDetail">Requesting browser location for this preview.</div>
+        <div class="detail" id="statusDetail">Verificando token y cargando ubicación…</div>
       </div>
 
-      <p class="hint">
-        Browser preview only — layout matches the SwiftUI app. The real app runs in Xcode on a simulator or device.
+      <p class="hint" id="hint">
+        Esta es una vista privada de ubicación en tiempo real. El enlace es personal y no debe compartirse públicamente.
       </p>
     </div>
   </div>
@@ -153,65 +271,354 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+  <script async defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     (function () {
-      var la = [34.0522, -118.2437];
-      var map = L.map("map", {
-        zoomControl: false,
-        attributionControl: true,
-      }).setView(la, 11);
+      // Configuration — update with your Supabase credentials
+      const SUPABASE_URL = "https://YOUR_PROJECT_REF.supabase.co";
+      const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap",
-      }).addTo(map);
+      // State
+      let supabase = null;
+      let map = null;
+      let marker = null;
+      let subscription = null;
+      let lastUpdateTime = null;
+      let viewerToken = null;
+      let userId = null;
+      let isAlertState = false;
+      let updateTimestampInterval = null;
 
-      var marker = L.circleMarker(la, {
-        radius: 6,
-        fillColor: "#007AFF",
-        color: "#fff",
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 1,
-      }).addTo(map);
+      // DOM elements
+      const statusDot = document.getElementById("statusDot");
+      const statusTitle = document.getElementById("statusTitle");
+      const statusDetail = document.getElementById("statusDetail");
+      const errorState = document.getElementById("errorState");
+      const errorTitle = document.getElementById("errorTitle");
+      const errorMessage = document.getElementById("errorMessage");
+      const subtitle = document.getElementById("subtitle");
+      const phoneElement = document.querySelector(".phone");
 
-      var dot = document.getElementById("statusDot");
-      var title = document.getElementById("statusTitle");
-      var detail = document.getElementById("statusDetail");
+      // Alert sound (data URI base64)
+      const alertAudioBase64 = "SUQzBAAAAAAAI1NUVEUAAAAOAAAAU3ViamVjdAAAAAtBbGVydCBUb25lAABJbmZvAAAACwAAAOgAAAAAA==";
 
-      function setStatus(kind, t, d) {
-        dot.className = "dot" + (kind === "warn" ? " warn" : kind === "muted" ? " muted" : "");
-        title.textContent = t;
-        detail.textContent = d;
+      /**
+       * Initialize Supabase client
+       */
+      function initSupabase() {
+        if (!SUPABASE_URL || SUPABASE_URL === "https://YOUR_PROJECT_REF.supabase.co") {
+          showError("Configuration Missing", "Supabase credentials not configured in HTML. Please update SUPABASE_URL and SUPABASE_ANON_KEY.");
+          return false;
+        }
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        return true;
       }
 
-      if (!navigator.geolocation) {
-        setStatus("warn", "Location unavailable", "This browser did not expose geolocation; map centered on Los Angeles.");
-        return;
+      /**
+       * Extract token from URL: accion.app/watch/[token]
+       */
+      function extractTokenFromURL() {
+        const path = window.location.pathname;
+        const parts = path.split("/");
+        const watchIndex = parts.indexOf("watch");
+        if (watchIndex !== -1 && parts[watchIndex + 1]) {
+          return parts[watchIndex + 1];
+        }
+        return new URLSearchParams(window.location.search).get("token");
       }
 
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          var lat = pos.coords.latitude;
-          var lng = pos.coords.longitude;
-          var ll = [lat, lng];
-          map.setView(ll, 14);
-          marker.setLatLng(ll);
-          setStatus(
-            "ok",
-            "Location on",
-            "Preview at " + lat.toFixed(4) + ", " + lng.toFixed(4) + " (browser geolocation)."
-          );
-        },
-        function () {
-          setStatus(
-            "warn",
-            "Location blocked",
-            "Allow location for this page to move the pin, or use the LA default."
-          );
-        },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-      );
+      /**
+       * Validate token and retrieve user_id
+       */
+      async function validateToken(token) {
+        try {
+          const { data, error } = await supabase
+            .from("viewer_tokens")
+            .select("user_id")
+            .eq("token", token)
+            .single();
+
+          if (error) {
+            showError("Token Invalid", "The viewer token is invalid or expired. Please check the link.");
+            return null;
+          }
+
+          return data?.user_id || null;
+        } catch (err) {
+          showError("Validation Error", err.message || "Failed to validate token.");
+          return null;
+        }
+      }
+
+      /**
+       * Fetch latest location ping for user
+       */
+      async function fetchLatestPing(userId) {
+        try {
+          const { data, error } = await supabase
+            .from("location_pings")
+            .select("*")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (error) {
+            console.error("Error fetching ping:", error);
+            return null;
+          }
+
+          return data;
+        } catch (err) {
+          console.error("Fetch error:", err);
+          return null;
+        }
+      }
+
+      /**
+       * Update map and status with location data
+       */
+      function updateLocation(ping) {
+        if (!ping) {
+          statusTitle.textContent = "Ubicación no disponible";
+          statusDetail.textContent = "No hay datos de ubicación.";
+          statusDot.className = "dot";
+          return;
+        }
+
+        const lat = ping.latitude;
+        const lng = ping.longitude;
+        const accuracy = ping.accuracy_m;
+        const timestamp = new Date(ping.created_at);
+        const isAlert = ping.ping_type === "alert";
+
+        // Update map
+        if (!marker) {
+          const markerColor = isAlert ? "#ff3b30" : "#0073e6";
+          marker = L.circleMarker([lat, lng], {
+            radius: 8,
+            fillColor: markerColor,
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 1,
+          }).addTo(map);
+        } else {
+          marker.setLatLng([lat, lng]);
+          const markerColor = isAlert ? "#ff3b30" : "#0073e6";
+          marker.setStyle({ fillColor: markerColor });
+        }
+
+        map.setView([lat, lng], 15);
+
+        // Update state
+        lastUpdateTime = timestamp;
+        isAlertState = isAlert;
+
+        // Update UI
+        if (isAlert) {
+          statusDot.className = "dot alert";
+          statusTitle.textContent = "ALERTA";
+          phoneElement.classList.add("alert-active");
+          playAlertSound();
+        } else {
+          statusDot.className = "dot";
+          statusTitle.textContent = "Está bien";
+          phoneElement.classList.remove("alert-active");
+        }
+
+        subtitle.textContent = isAlert ? "Alerta de emergencia activada" : "Ubicación en tiempo real";
+        updateTimestamp();
+        hideError();
+      }
+
+      /**
+       * Update timestamp display
+       */
+      function updateTimestamp() {
+        if (!lastUpdateTime) return;
+
+        const now = new Date();
+        const diff = Math.floor((now - lastUpdateTime) / 1000);
+
+        let timeText = "Hace " + diff + "s";
+        if (diff >= 60) {
+          const minutes = Math.floor(diff / 60);
+          timeText = "Hace " + minutes + "m";
+        }
+        if (diff >= 3600) {
+          const hours = Math.floor(diff / 3600);
+          timeText = "Hace " + hours + "h";
+        }
+
+        const lat = marker ? marker.getLatLng().lat : "—";
+        const lng = marker ? marker.getLatLng().lng : "—";
+        const coords = typeof lat === "number" ? lat.toFixed(4) + ", " + lng.toFixed(4) : "—";
+
+        statusDetail.textContent = timeText + " • " + coords;
+      }
+
+      /**
+       * Play alert sound
+       */
+      function playAlertSound() {
+        try {
+          // Create a simple beep using Web Audio API
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+
+          oscillator.frequency.value = 800;
+          oscillator.type = "sine";
+
+          gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (err) {
+          console.error("Audio error:", err);
+        }
+      }
+
+      /**
+       * Subscribe to real-time updates
+       */
+      async function subscribeToUpdates(userId) {
+        // Unsubscribe previous subscription if exists
+        if (subscription) {
+          await subscription.unsubscribe();
+        }
+
+        // Subscribe to new inserts for this user
+        subscription = supabase
+          .channel("location_updates_" + userId)
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT",
+              schema: "public",
+              table: "location_pings",
+              filter: "user_id=eq." + userId,
+            },
+            (payload) => {
+              console.log("Location update received:", payload);
+              updateLocation(payload.new);
+            }
+          )
+          .subscribe((status) => {
+            console.log("Subscription status:", status);
+          });
+      }
+
+      /**
+       * Show error message
+       */
+      function showError(title, message) {
+        errorTitle.textContent = title;
+        errorMessage.textContent = message;
+        errorState.classList.add("show");
+      }
+
+      /**
+       * Hide error message
+       */
+      function hideError() {
+        errorState.classList.remove("show");
+      }
+
+      /**
+       * Initialize map
+       */
+      function initMap() {
+        map = L.map("map", {
+          zoomControl: false,
+          attributionControl: false,
+        }).setView([34.0522, -118.2437], 14);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap",
+        }).addTo(map);
+      }
+
+      /**
+       * Start periodic timestamp updates
+       */
+      function startTimestampUpdater() {
+        if (updateTimestampInterval) clearInterval(updateTimestampInterval);
+        updateTimestampInterval = setInterval(updateTimestamp, 1000);
+      }
+
+      /**
+       * Main initialization
+       */
+      async function init() {
+        try {
+          // Initialize Supabase
+          if (!initSupabase()) return;
+
+          // Wait for Supabase to load if needed
+          if (!window.supabase) {
+            setTimeout(init, 100);
+            return;
+          }
+
+          // Initialize map
+          initMap();
+
+          // Extract and validate token
+          viewerToken = extractTokenFromURL();
+          if (!viewerToken) {
+            showError("Token Missing", "No viewer token found in URL. Please use the shareable link provided.");
+            return;
+          }
+
+          userId = await validateToken(viewerToken);
+          if (!userId) {
+            return;
+          }
+
+          // Fetch initial location
+          const latestPing = await fetchLatestPing(userId);
+          if (latestPing) {
+            updateLocation(latestPing);
+          } else {
+            statusTitle.textContent = "Sin ubicación";
+            statusDetail.textContent = "Esperando el primer ping de ubicación…";
+          }
+
+          // Subscribe to updates
+          await subscribeToUpdates(userId);
+
+          // Start timestamp updater
+          startTimestampUpdater();
+        } catch (err) {
+          console.error("Initialization error:", err);
+          showError("Initialization Failed", err.message || "An unexpected error occurred.");
+        }
+      }
+
+      // Start initialization when DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+
+      // Cleanup on page unload
+      window.addEventListener("beforeunload", async () => {
+        if (subscription) {
+          await subscription.unsubscribe();
+        }
+        if (updateTimestampInterval) {
+          clearInterval(updateTimestampInterval);
+        }
+      });
     })();
   </script>
 </body>
