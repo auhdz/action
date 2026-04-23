@@ -1,107 +1,162 @@
-# Privacy Policy
+# Acción Privacy Policy
 
-**Last Updated:** April 22, 2026
+**Effective Date:** April 2026
 
-## Overview
+## Introduction
 
-Acción is a personal security app designed to protect your safety by sharing your location with trusted contacts. We are deeply committed to protecting your privacy and being transparent about how we handle your data.
+Acción ("App", "we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains our data practices and how we collect, use, and share information when you use our mobile application.
 
 ## Information We Collect
 
 ### Location Data
-- **Real-time GPS location:** Your latitude, longitude, and accuracy measurements as you use the app
-- **Location history:** Each location ping is timestamped and stored in our database
-- **Trigger events:** When you activate the emergency button, we record the alert and your location at that moment
 
-### Contact Information
-- **Phone numbers:** Only the phone numbers of your trusted emergency contacts that you explicitly add
-- **Contact names:** The names you assign to your trusted contacts
+**Real-Time GPS Location:** When you grant permission, Acción collects your precise GPS coordinates (latitude, longitude, and accuracy) from your device's location services.
 
-### Device Information
-- **Device identifier:** A unique anonymous session ID for your device (no device name or IDFA)
-- **App version:** The version of Acción you are running
-- **Basic usage logs:** Which features you interact with (onboarding steps, emergency button presses)
+- Collection Method: CoreLocation framework (iOS native)
+- Frequency: Continuous while the app is active
+- Minimum Resolution: Within 10 meters of your actual location
+- Permission: iOS "When In Use" (requires explicit user consent)
 
-### Authentication Data
-- **Anonymous user ID:** A unique identifier generated on first launch to identify your data in our system
-- **No email or password:** We never collect personal identifiers like email addresses or passwords
+### Contact Data
+
+**Emergency Contacts:** If you add trusted contacts, the app stores their names, phone numbers, and email addresses locally on your device.
+
+- Storage: Local device storage only (not transmitted by default)
+- Purpose: For emergency SOS notifications
+- User Control: You can add/remove contacts at any time
+
+### Supabase Backend Data
+
+When you use the location sharing feature, the following data is transmitted to our Supabase backend:
+
+- Your anonymous user ID (UUID generated on first launch)
+- GPS coordinates (latitude, longitude)
+- Location accuracy (in meters)
+- Timestamp of location update
+- Ping type (normal or alert)
+
+**Note:** No personal identifiers (name, phone, email) are sent to the backend unless explicitly shared through emergency features.
+
+### Device Identifiers
+
+- Unique anonymous user ID (generated locally, never linked to Apple ID or personal information)
+- iOS version (for debugging crashes)
+
+### Crash Reports
+
+If the app crashes, we may collect:
+- Stack traces
+- Device information
+- App version
+- iOS version
+
+This is handled by Apple's crash reporting system.
 
 ## How We Use Your Information
 
-### Location Data
-- **Real-time sharing:** To display your location to trusted contacts you've authorized
-- **Emergency alerting:** To send your coordinates to emergency contacts when you activate the alert button
-- **Viewer links:** To allow you to generate and share a private link that shows your current location to authorized viewers
-- **Service improvement:** To analyze usage patterns and improve the reliability of the app (anonymized)
-
-### Contact Information
-- **Emergency notifications:** To send SMS alerts to your trusted contacts when you press the emergency button
-- **Your control:** You can edit or delete contacts at any time
-
-### Device Information
-- **App stability:** To diagnose crashes and improve app performance
-- **Feature analytics:** To understand which features are most useful
+1. **Location Display:** To show your current location on the map widget
+2. **Location History:** To track your movement history for future "trusted viewer" features
+3. **Emergency Alerts:** To notify trusted contacts during SOS activation
+4. **Service Improvement:** To identify bugs, optimize performance, and improve features
+5. **Analytics:** To understand app usage patterns (anonymized only)
+6. **Legal Compliance:** To comply with applicable laws and legal processes
 
 ## Data Retention
 
-- **Location pings:** Stored indefinitely in your account (you can request deletion at any time)
-- **Trusted contacts:** Stored until you delete them
-- **Viewer tokens:** Generated on-demand and never shared; you can revoke access at any time
-- **Anonymous user ID:** Tied to your device; clearing app data will generate a new ID on next launch
+- **Real-Time Location:** Displayed locally on your device only; backend retention configurable
+- **Emergency Contacts:** Retained locally until you delete them
+- **Location History:** Retained in Supabase according to your privacy settings (default: unlimited unless you configure retention policies)
+- **Crash Reports:** Retained by Apple for 30 days
 
-## Data Storage & Security
+## Data Sharing
 
-- **Supabase backend:** All data is stored on Supabase servers encrypted at rest and in transit (TLS 1.3+)
-- **Database security:** Your location data is protected by row-level security (RLS) policies — only you and your authorized viewers can see your location
-- **No third-party data brokers:** We never sell or share your location data with advertisers or data brokers
-- **Viewer tokens:** Treated as opaque cryptographic credentials, never exposed in browser history or logs
+We **do not sell or share your personal location data** with third parties, except in these cases:
 
-## Anonymous Authentication
+1. **Trusted Contacts (Future):** When you explicitly share your location with someone (not yet implemented in MVP)
+2. **Law Enforcement:** Only if legally required (subpoena, court order)
+3. **Service Providers:** Supabase (our data processor) for backend hosting
+4. **Account Deletion:** Your data is deleted if you request it
 
-Acción uses **anonymous authentication** by default:
-- No email signup required
-- No password to remember
-- Your anonymous session is tied to your device
-- If you uninstall the app, a new session is created on reinstall
+### Supabase Data Processing
 
-## Viewer Links
+Supabase is our backend provider and data processor:
+- Location data is stored in PostgreSQL (EU region by default)
+- Supabase applies encryption at rest and in transit
+- Supabase has a Data Processing Agreement compliant with GDPR
+- Supabase location: https://supabase.com/privacy
 
-When you generate a viewer link to share with someone:
-- The link contains a secure token that grants temporary access to your location
-- You control who receives this link and can revoke access at any time
-- The recipient cannot see your contact information or trusted contacts
-- The recipient only sees your real-time location
+## Your Privacy Rights
 
-## Your Rights
+Under GDPR, CCPA, and other privacy laws, you have the right to:
 
-You have the right to:
-- **Access:** Request a copy of all location data we have collected
-- **Delete:** Request permanent deletion of your account and all associated data
-- **Withdraw consent:** Deny location permission at any time via iOS Settings
-- **Revoke access:** Delete trusted contacts or revoke viewer tokens to stop sharing
+- **Access:** Request a copy of all data we hold about you
+- **Rectification:** Correct inaccurate information
+- **Deletion:** Request permanent deletion of your account and location history (right to be forgotten)
+- **Portability:** Export your data in a standard format
+- **Objection:** Opt-out of certain data uses
 
-To exercise these rights, contact us at taquestudios@gmail.com.
+To exercise these rights, contact us at **privacy@accion.app**.
+
+## Location Permission Transparency
+
+The app displays what iOS permission level you've granted:
+- **"Never":** App cannot access location (nothing sent to Supabase)
+- **"While Using":** Location shared only when app is active
+- **"Always":** Location shared continuously (not implemented in MVP)
+
+You can change location permission anytime in iOS Settings → Privacy → Location Services.
+
+## Security
+
+We implement:
+- HTTPS/TLS encryption for all data in transit
+- Anonymous authentication (no passwords, email, or API keys stored locally)
+- Row-Level Security (RLS) in the backend database (users can only access their own location data)
+- No third-party analytics or tracking cookies
+- Local device storage is encrypted by iOS
+
+**However:** No transmission over the internet is 100% secure. We cannot guarantee absolute security, and use is at your own risk.
+
+## Children's Privacy
+
+Acción is not intended for children under 13. We do not knowingly collect personal information from children. If we learn that a child under 13 has provided information, we will delete it immediately.
 
 ## Changes to This Policy
 
-We may update this privacy policy as we add features or improve our services. We will notify you of material changes via the app. Continued use of Acción constitutes acceptance of the updated policy.
+We may update this Privacy Policy at any time. Changes will be effective immediately upon posting, with an updated "Effective Date" above. Continued use of the app constitutes acceptance of the updated policy.
 
 ## Contact Us
 
-If you have questions about this privacy policy or how we handle your data, please contact us at:
+For privacy questions, requests, or to exercise your rights:
 
-**Email:** taquestudios@gmail.com
+**Email:** privacy@accion.app
+
+## GDPR Compliance (EU Users)
+
+**Legal Basis:** Your location data is processed based on your explicit consent (iOS permission). You can withdraw consent anytime in iOS Settings.
+
+If you have a privacy complaint, you have the right to lodge a complaint with your national data protection authority.
+
+## California Privacy Rights (CCPA)
+
+California residents have the right to:
+- Know what personal information is collected
+- Delete personal information
+- Opt-out of the "sale" of personal information (we do not sell data)
+
+To request access or deletion, contact privacy@accion.app.
+
+## Additional Disclosures
+
+### Third-Party Services
+
+| Service | Purpose | Privacy Policy |
+|---------|---------|-----------------|
+| Supabase | Backend database | https://supabase.com/privacy |
+| Apple Maps | Map display | https://www.apple.com/privacy/maps/ |
 
 ---
 
-## Summary
+**Last Updated:** April 2026
 
-**What we collect:** Location, trusted contact phone numbers, anonymous session ID, minimal device info.
-
-**Why:** To enable real-time location sharing and emergency alerts to people you trust.
-
-**How it's protected:** Encrypted storage, row-level security, anonymous authentication, no third-party sharing.
-
-**Your control:** You control who sees your location, can revoke access anytime, and can request deletion.
-
-Acción respects your privacy. Your safety, autonomy, and security come first.
+*Acción is a community safety app built with privacy-first principles. We believe location data belongs to you, not us.*
