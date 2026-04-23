@@ -55,6 +55,26 @@ final class LocationSyncService: ObservableObject {
     }
 
     private func send(location: CLLocation, now: Date) async {
+        await sendPing(location: location, now: now, pingType: "normal")
+    }
+
+    func insertAlertPing() async throws {
+        guard let location = locationManager.location else {
+            lastError = "No location available"
+            throw NSError(domain: "LocationSyncService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No location available"])
+        }
+        await sendPing(location: location, now: Date(), pingType: "alert")
+    }
+
+    func resetAlertPing() async throws {
+        guard let location = locationManager.location else {
+            lastError = "No location available"
+            throw NSError(domain: "LocationSyncService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No location available"])
+        }
+        await sendPing(location: location, now: Date(), pingType: "normal")
+    }
+
+    private func sendPing(location: CLLocation, now: Date, pingType: String) async {
         lastError = nil
 
         if configuration.supabaseAnonKey == AppConfiguration.placeholder.supabaseAnonKey {
@@ -69,7 +89,8 @@ final class LocationSyncService: ObservableObject {
                 latitude: location.coordinate.latitude,
                 longitude: location.coordinate.longitude,
                 accuracyM: location.horizontalAccuracy,
-                recordedAt: LocationPingRow.iso8601.string(from: location.timestamp)
+                recordedAt: LocationPingRow.iso8601.string(from: location.timestamp),
+                pingType: pingType
             )
 
             try await supabase
@@ -113,11 +134,13 @@ private struct LocationPingRow: Encodable {
     let longitude: Double
     let accuracyM: Double
     let recordedAt: String
+    let pingType: String
 
     enum CodingKeys: String, CodingKey {
         case latitude
         case longitude
         case accuracyM = "accuracy_m"
         case recordedAt = "recorded_at"
+        case pingType = "ping_type"
     }
 }
