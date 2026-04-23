@@ -16,9 +16,9 @@ struct TrustedContact: Identifiable, Codable {
 final class ContactsService: NSObject, ObservableObject {
     @Published private(set) var contacts: [TrustedContact] = []
     @Published private(set) var authorizationStatus: CNAuthorizationStatus
+    @Published private(set) var lastError: String?
 
     private let contactStore = CNContactStore()
-    static let shared = ContactsService()
 
     override init() {
         authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
@@ -30,10 +30,15 @@ final class ContactsService: NSObject, ObservableObject {
     func requestAuthorizationIfNeeded() {
         switch authorizationStatus {
         case .notDetermined:
-            contactStore.requestAccess(for: .contacts) { [weak self] granted, _ in
+            contactStore.requestAccess(for: .contacts) { [weak self] granted, error in
                 Task { @MainActor [weak self] in
                     self?.authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
-                    if granted {
+                    if !granted {
+                        if let error = error {
+                            print("Contact access denied: \(error.localizedDescription)")
+                            self?.lastError = "Contact access denied: \(error.localizedDescription)"
+                        }
+                    } else {
                         await self?.fetchAllContacts()
                     }
                 }
@@ -88,10 +93,15 @@ final class ContactsService: NSObject, ObservableObject {
 
                     // Create a TrustedContact entry for each phone number
                     for phoneNumber in contact.phoneNumbers {
+                        let phoneValue = phoneNumber.value.stringValue
+                        // Generate stable ID based on contact identifier and phone number
+                        let contactId = "\(contact.identifier)-\(phoneValue)"
+                        let id = String(contactId.hashValue.magnitude)
+
                         let trustedContact = TrustedContact(
-                            id: UUID().uuidString,
+                            id: id,
                             name: fullName,
-                            phoneNumber: phoneNumber.value.stringValue
+                            phoneNumber: phoneValue
                         )
                         trustedContacts.append(trustedContact)
                     }
@@ -99,11 +109,11 @@ final class ContactsService: NSObject, ObservableObject {
             }
 
             self.contacts = trustedContacts
+            self.lastError = nil
             return trustedContacts
         } catch {
-            #if DEBUG
             print("Contacts error: \(error.localizedDescription)")
-            #endif
+            self.lastError = "Failed to load contacts: \(error.localizedDescription)"
             return []
         }
     }
