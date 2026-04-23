@@ -14,7 +14,10 @@
       "Bash(xcodebuild -scheme Action -configuration Debug -destination \"platform=iOS Simulator,name=iPhone 15\" build)",
       "Bash(swift -parse /Users/ahernandez5/action/ios/Action/Action/Services/ViewerTokenService.swift)",
       "Bash(xcodebuild build *)",
-      "Bash(xcodebuild *)"
+      "Bash(xcodebuild *)",
+      "Bash(xcrun simctl *)",
+      "Bash(xcrun swiftc *)",
+      "Bash(awk '{print $NF}')"
     ]
   }
 }

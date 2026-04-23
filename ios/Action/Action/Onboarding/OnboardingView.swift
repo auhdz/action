@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 // MARK: - OnboardingStep Enum
@@ -47,6 +48,7 @@ struct OnboardingView: View {
 struct LocationPermissionView: View {
     @ObservedObject var onboardingState: OnboardingState
     @EnvironmentObject var appModel: AppModel
+    @State private var authorizationObserver: AnyCancellable?
 
     var body: some View {
         ZStack {
@@ -79,7 +81,13 @@ struct LocationPermissionView: View {
                 VStack(spacing: 12) {
                     Button(action: {
                         appModel.locationManager.requestAuthorizationIfNeeded()
-                        onboardingState.step = .complete
+                        // Monitor authorization status change
+                        authorizationObserver = appModel.locationManager.$authorizationStatus
+                            .filter { $0 != .notDetermined }
+                            .first()
+                            .sink { _ in
+                                onboardingState.step = .complete
+                            }
                     }) {
                         Text("Permitir ubicación")
                             .font(.system(size: 16, weight: .semibold, design: .default))
@@ -105,6 +113,9 @@ struct LocationPermissionView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
             }
+        }
+        .onDisappear {
+            authorizationObserver?.cancel()
         }
     }
 }
