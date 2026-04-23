@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Action</string>
+	<string>Acción</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,8 +22,10 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>Acción necesita acceso a tus contactos para agregar personas de confianza a tu red de seguridad.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Action uses your location to show where you are on the map and to send encrypted location pings to your project backend when you use the app.</string>
+	<string>Acción necesita tu ubicación para compartirla con tus contactos de confianza.</string>
 	<key>SUPABASE_ANON_KEY</key>
 	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>SUPABASE_URL</key>

@@ -1,7 +1,8 @@
 // Base settings. Copy `Secrets.example.xcconfig` to `Secrets.xcconfig` and fill in values (Secrets.xcconfig is gitignored).
 #include? "Secrets.xcconfig"
 
-PRODUCT_NAME = Action
+PRODUCT_NAME = Acción
+BUNDLE_DISPLAY_NAME = Acción
 PRODUCT_BUNDLE_IDENTIFIER = com.action.Action
 MARKETING_VERSION = 1.0
 CURRENT_PROJECT_VERSION = 1
