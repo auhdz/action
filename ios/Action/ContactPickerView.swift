@@ -171,7 +171,11 @@ struct ContactPickerView: View {
 
         do {
             // Ensure we have an authenticated session
-            let supabaseClient = AppConfiguration.current.supabaseClient
+            let config = AppConfiguration.current
+            let supabaseClient = SupabaseClient(
+                supabaseURL: config.supabaseURL,
+                supabaseKey: config.supabaseAnonKey
+            )
             try await ensureAnonymousSessionIfNeeded(supabaseClient)
 
             // Get the current user ID
@@ -203,10 +207,19 @@ struct ContactPickerView: View {
             }
 
             // Ensure viewer token exists
-            let viewerTokenService = await MainActor.run {
-                ViewerTokenService(supabaseClient: supabaseClient)
+            // Ensure viewer token exists (inlined)
+            let existingTokens: [[String: AnyJSON]] = try await supabaseClient
+                .from("viewer_tokens")
+                .select()
+                .eq("user_id", value: userId)
+                .execute()
+                .value
+            if existingTokens.isEmpty {
+                _ = try await supabaseClient
+                    .from("viewer_tokens")
+                    .insert(["user_id": userId])
+                    .execute()
             }
-            await viewerTokenService.ensureViewerTokenExists()
 
             // Update onboarding state and move to next step
             await MainActor.run {
