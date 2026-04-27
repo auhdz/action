@@ -8,56 +8,50 @@ import Supabase
 struct ContactPickerView: View {
     @ObservedObject var onboardingState: OnboardingState
     @EnvironmentObject var appModel: AppModel
+    @EnvironmentObject var lang: LanguageManager
 
     @StateObject private var contactsService = ContactsService()
     @State private var searchText = ""
     @State private var selectedContactIds: Set<String> = []
     @State private var isSaving = false
-    @State private var errorMessage: String?
-    @State private var showErrorAlert = false
 
-    // Maximum allowed contacts
     private let maxContacts = 5
 
-    // Filtered contacts based on search text
     var filteredContacts: [TrustedContact] {
-        if searchText.isEmpty {
-            return contactsService.contacts
-        }
-        return contactsService.contacts.filter { contact in
-            contact.name.localizedCaseInsensitiveContains(searchText)
+        if searchText.isEmpty { return contactsService.contacts }
+        return contactsService.contacts.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
         }
     }
 
-    // Count of selected contacts
-    var selectedCount: Int {
-        selectedContactIds.count
-    }
+    var selectedCount: Int { selectedContactIds.count }
 
-    // Button text based on selection state
     var buttonText: String {
         if selectedCount == 0 {
-            return "Continuar sin contactos"
-        } else {
-            return "Continuar (\(selectedCount))"
+            return lang.isSpanish ? "Continuar sin contactos" : "Continue without contacts"
         }
+        return lang.isSpanish ? "Continuar (\(selectedCount))" : "Continue (\(selectedCount))"
     }
 
     var body: some View {
         ZStack {
-            Color.white
-                .ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header with title and safety nudge
+                // Header
                 VStack(spacing: 12) {
-                    Text("Contactos de Confianza")
-                        .font(.system(size: 28, weight: .bold, design: .default))
-                        .foregroundStyle(.primary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Text(lang.isSpanish ? "Contactos de Confianza" : "Trusted Contacts")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        LanguageToggle()
+                    }
 
-                    Text("Para tu seguridad, te recomendamos agregar al menos un contacto de confianza.")
-                        .font(.system(size: 14, weight: .regular, design: .default))
+                    Text(lang.isSpanish
+                         ? "Para tu seguridad, te recomendamos agregar al menos un contacto de confianza."
+                         : "For your safety, we recommend adding at least one trusted contact.")
+                        .font(.system(size: 14, weight: .regular))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -67,15 +61,13 @@ struct ContactPickerView: View {
 
                 // Search bar
                 HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
-
-                    TextField("Buscar contacto", text: $searchText)
-                        .font(.system(size: 16, weight: .regular, design: .default))
+                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                    TextField(lang.isSpanish ? "Buscar contacto" : "Search contact", text: $searchText)
+                        .font(.system(size: 16))
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
-                .background(Color(red: 0.0, green: 0.0, blue: 0.0, opacity: 0.05))
+                .background(Color.black.opacity(0.05))
                 .cornerRadius(8)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 16)
@@ -87,14 +79,23 @@ struct ContactPickerView: View {
                             .font(.system(size: 48))
                             .foregroundStyle(.secondary)
 
-                        Text("Sin resultados")
-                            .font(.system(size: 16, weight: .semibold, design: .default))
+                        Text(lang.isSpanish ? "Sin resultados" : "No results")
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.secondary)
 
                         if !searchText.isEmpty {
-                            Text("No se encontraron contactos con ese nombre")
-                                .font(.system(size: 14, weight: .regular, design: .default))
+                            Text(lang.isSpanish
+                                 ? "No se encontraron contactos con ese nombre"
+                                 : "No contacts found with that name")
+                                .font(.system(size: 14))
                                 .foregroundStyle(.tertiary)
+                        } else if contactsService.authorizationStatus != .authorized && contactsService.authorizationStatus != .limited {
+                            Text(lang.isSpanish
+                                 ? "Permite el acceso a contactos en Ajustes"
+                                 : "Allow contacts access in Settings")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.tertiary)
+                                .multilineTextAlignment(.center)
                         }
                     }
                     .frame(maxHeight: .infinity)
@@ -107,9 +108,7 @@ struct ContactPickerView: View {
                                     contact: contact,
                                     isSelected: selectedContactIds.contains(contact.id),
                                     isDisabled: selectedCount >= maxContacts && !selectedContactIds.contains(contact.id),
-                                    onTap: {
-                                        toggleContact(contact.id)
-                                    }
+                                    onTap: { toggleContact(contact.id) }
                                 )
                             }
                         }
@@ -119,39 +118,32 @@ struct ContactPickerView: View {
                 }
 
                 // Continue button
-                VStack(spacing: 12) {
-                    Button(action: {
-                        Task {
-                            await saveContactsAndContinue()
+                Button(action: {
+                    Task { await saveContactsAndContinue() }
+                }) {
+                    Group {
+                        if isSaving {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text(buttonText)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white)
                         }
-                    }) {
-                        Text(buttonText)
-                            .font(.system(size: 16, weight: .semibold, design: .default))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color(red: 0.0, green: 0.45, blue: 0.90))
-                            .cornerRadius(12)
-                            .opacity(isSaving ? 0.6 : 1.0)
                     }
-                    .disabled(isSaving)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(Color(red: 0.0, green: 0.45, blue: 0.90))
+                    .cornerRadius(12)
+                    .opacity(isSaving ? 0.6 : 1.0)
                 }
+                .disabled(isSaving)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
             }
         }
         .onAppear {
             contactsService.requestAuthorizationIfNeeded()
-            Task {
-                _ = await contactsService.fetchAllContacts()
-            }
-        }
-        .alert("Error", isPresented: $showErrorAlert) {
-            Button("OK") {
-                showErrorAlert = false
-            }
-        } message: {
-            Text(errorMessage ?? "Ocurrió un error desconocido")
+            Task { _ = await contactsService.fetchAllContacts() }
         }
     }
 
@@ -167,79 +159,51 @@ struct ContactPickerView: View {
 
     private func saveContactsAndContinue() async {
         isSaving = true
-        defer { isSaving = false }
 
-        do {
-            // Build Supabase client from app config
-            let config = AppConfiguration.current
-            let supabaseClient = SupabaseClient(
-                supabaseURL: config.supabaseURL,
-                supabaseKey: config.supabaseAnonKey
-            )
-            try await ensureAnonymousSessionIfNeeded(supabaseClient)
+        let selectedContactsList = contactsService.contacts
+            .filter { selectedContactIds.contains($0.id) }
 
-            // Get the current user ID
-            let session = try await supabaseClient.auth.session
-            let userId = session.user.id.uuidString
+        // Always proceed — never block onboarding on network calls
+        await MainActor.run {
+            onboardingState.selectedContacts = selectedContactsList
+            onboardingState.step = .locationPermission
+            isSaving = false
+        }
 
-            // Delete any existing trusted contacts for this user
-            _ = try await supabaseClient
-                .from("trusted_contacts")
-                .delete()
-                .eq("user_id", value: userId)
-                .execute()
+        // Save to Supabase in background (non-blocking)
+        Task.detached {
+            do {
+                let config = AppConfiguration.current
+                let client = SupabaseClient(
+                    supabaseURL: config.supabaseURL,
+                    supabaseKey: config.supabaseAnonKey
+                )
 
-            // Insert selected contacts
-            let selectedContactsList = contactsService.contacts
-                .filter { selectedContactIds.contains($0.id) }
+                // Ensure session
+                if (try? await client.auth.session) == nil {
+                    _ = try await client.auth.signInAnonymously()
+                }
 
-            if !selectedContactsList.isEmpty {
+                let userId = try await client.auth.session.user.id.uuidString
+
+                _ = try await client.from("trusted_contacts")
+                    .delete().eq("user_id", value: userId).execute()
+
                 for contact in selectedContactsList {
-                    _ = try await supabaseClient
-                        .from("trusted_contacts")
-                        .insert([
-                            "user_id": userId,
-                            "name": contact.name,
-                            "phone_number": contact.phoneNumber
-                        ])
+                    _ = try await client.from("trusted_contacts")
+                        .insert(["user_id": userId, "name": contact.name, "phone_number": contact.phoneNumber])
                         .execute()
                 }
-            }
 
-            // Ensure viewer token exists (inline — no external service needed)
-            let existingTokens: [[String: AnyJSON]] = try await supabaseClient
-                .from("viewer_tokens")
-                .select()
-                .eq("user_id", value: userId)
-                .execute()
-                .value
-            if existingTokens.isEmpty {
-                _ = try await supabaseClient
-                    .from("viewer_tokens")
-                    .insert(["user_id": userId])
-                    .execute()
+                let tokens: [[String: AnyJSON]] = try await client
+                    .from("viewer_tokens").select().eq("user_id", value: userId).execute().value
+                if tokens.isEmpty {
+                    _ = try await client.from("viewer_tokens").insert(["user_id": userId]).execute()
+                }
+            } catch {
+                print("Background Supabase sync failed: \(error.localizedDescription)")
             }
-
-            // Update onboarding state and move to next step
-            await MainActor.run {
-                onboardingState.selectedContacts = selectedContactsList
-                onboardingState.step = .locationPermission
-            }
-        } catch {
-            errorMessage = "No se pudo guardar los contactos: \(error.localizedDescription)"
-            showErrorAlert = true
         }
-    }
-
-    private func ensureAnonymousSessionIfNeeded(_ supabaseClient: SupabaseClient) async throws {
-        do {
-            _ = try await supabaseClient.auth.session
-            return
-        } catch {
-            // No session; try anonymous sign-in.
-        }
-
-        _ = try await supabaseClient.auth.signInAnonymously()
     }
 }
 
@@ -254,43 +218,33 @@ struct ContactRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                // Avatar with initials
                 ZStack {
                     Circle()
                         .fill(Color(red: 0.0, green: 0.45, blue: 0.90).opacity(0.1))
-
                     Text(contact.name.prefix(1).uppercased())
-                        .font(.system(size: 18, weight: .semibold, design: .default))
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
                 }
                 .frame(width: 44, height: 44)
 
-                // Contact info
                 VStack(alignment: .leading, spacing: 4) {
                     Text(contact.name)
-                        .font(.system(size: 16, weight: .semibold, design: .default))
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.primary)
-
                     Text(contact.phoneNumber)
-                        .font(.system(size: 14, weight: .regular, design: .default))
+                        .font(.system(size: 14))
                         .foregroundStyle(.secondary)
                 }
 
                 Spacer()
 
-                // Checkmark
-                if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
-                } else {
-                    Image(systemName: "circle")
-                        .font(.system(size: 24))
-                        .foregroundStyle(.tertiary)
-                }
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 24))
+                    .foregroundColor(isSelected
+                        ? Color(red: 0.0, green: 0.45, blue: 0.90)
+                        : Color(UIColor.tertiaryLabel))
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
+            .padding(12)
             .background(Color.white)
             .cornerRadius(8)
             .opacity(isDisabled ? 0.5 : 1.0)
@@ -304,4 +258,5 @@ struct ContactRow: View {
 
     ContactPickerView(onboardingState: onboardingState)
         .environmentObject(AppModel())
+        .environmentObject(LanguageManager())
 }

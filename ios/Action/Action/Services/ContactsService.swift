@@ -57,7 +57,7 @@ final class ContactsService: NSObject, ObservableObject {
     // MARK: - Fetch Contacts
 
     func fetchAllContacts() async -> [TrustedContact] {
-        guard authorizationStatus == .authorized else {
+        guard authorizationStatus == .authorized || authorizationStatus == .limited else {
             #if DEBUG
             print("Contacts: not authorized")
             #endif

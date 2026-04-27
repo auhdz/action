@@ -30,18 +30,13 @@ struct OnboardingView: View {
             switch onboardingState.step {
             case .welcome:
                 WelcomeView(onboardingState: onboardingState)
-
             case .contacts:
                 ContactPickerView(onboardingState: onboardingState)
-
             case .locationPermission:
                 LocationPermissionView(onboardingState: onboardingState)
-
             case .complete:
                 ContentView()
-                    .onAppear {
-                        hasSeenOnboarding = true
-                    }
+                    .onAppear { hasSeenOnboarding = true }
             }
         }
     }
@@ -52,14 +47,21 @@ struct OnboardingView: View {
 struct LocationPermissionView: View {
     @ObservedObject var onboardingState: OnboardingState
     @EnvironmentObject var appModel: AppModel
+    @EnvironmentObject var lang: LanguageManager
     @State private var authorizationObserver: AnyCancellable?
 
     var body: some View {
         ZStack {
-            Color.white
-                .ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 24) {
+                HStack {
+                    Spacer()
+                    LanguageToggle()
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
                 Spacer()
 
                 VStack(spacing: 16) {
@@ -68,11 +70,13 @@ struct LocationPermissionView: View {
                         .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
 
                     VStack(spacing: 12) {
-                        Text("Ubicación en tiempo real")
-                            .font(.system(size: 24, weight: .semibold, design: .default))
+                        Text(lang.isSpanish ? "Ubicación en tiempo real" : "Real-Time Location")
+                            .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(.primary)
 
-                        Text("Acción necesita acceso a tu ubicación para compartir tu posición con tus contactos de confianza en tiempo real.")
+                        Text(lang.isSpanish
+                             ? "Acción necesita acceso a tu ubicación para compartir tu posición con tus contactos de confianza en tiempo real."
+                             : "Acción needs location access to share your position with your trusted contacts in real time.")
                             .font(.body)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -85,16 +89,13 @@ struct LocationPermissionView: View {
                 VStack(spacing: 12) {
                     Button(action: {
                         appModel.locationManager.requestAuthorizationIfNeeded()
-                        // Monitor authorization status change
                         authorizationObserver = appModel.locationManager.$authorizationStatus
                             .filter { $0 != .notDetermined }
                             .first()
-                            .sink { _ in
-                                onboardingState.step = .complete
-                            }
+                            .sink { _ in onboardingState.step = .complete }
                     }) {
-                        Text("Permitir ubicación")
-                            .font(.system(size: 16, weight: .semibold, design: .default))
+                        Text(lang.isSpanish ? "Permitir ubicación" : "Allow Location")
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
@@ -102,11 +103,9 @@ struct LocationPermissionView: View {
                             .cornerRadius(12)
                     }
 
-                    Button(action: {
-                        onboardingState.step = .complete
-                    }) {
-                        Text("Más tarde")
-                            .font(.system(size: 16, weight: .semibold, design: .default))
+                    Button(action: { onboardingState.step = .complete }) {
+                        Text(lang.isSpanish ? "Más tarde" : "Not Now")
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
@@ -118,14 +117,12 @@ struct LocationPermissionView: View {
                 .padding(.bottom, 32)
             }
         }
-        .onDisappear {
-            authorizationObserver?.cancel()
-        }
+        .onDisappear { authorizationObserver?.cancel() }
     }
 }
-
 
 #Preview {
     OnboardingView()
         .environmentObject(AppModel())
+        .environmentObject(LanguageManager())
 }
