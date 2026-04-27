@@ -5,8 +5,8 @@ import Supabase
 
 @MainActor
 final class LocationSyncService: ObservableObject {
-    @Published private(set) var lastSuccessfulPing: Date?
-    @Published private(set) var lastError: String?
+    @Published var lastSuccessfulPing: Date?
+    @Published var lastError: String?
 
     private let locationManager: LocationManager
     private let configuration: AppConfiguration
