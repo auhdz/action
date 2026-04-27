@@ -203,12 +203,16 @@ struct ContactPickerView: View {
             }
 
             // Ensure viewer token exists
-            let viewerTokenService = ViewerTokenService(supabaseClient: supabaseClient)
+            let viewerTokenService = await MainActor.run {
+                ViewerTokenService(supabaseClient: supabaseClient)
+            }
             await viewerTokenService.ensureViewerTokenExists()
 
             // Update onboarding state and move to next step
-            onboardingState.selectedContacts = selectedContactsList
-            onboardingState.step = .locationPermission
+            await MainActor.run {
+                onboardingState.selectedContacts = selectedContactsList
+                onboardingState.step = .locationPermission
+            }
         } catch {
             errorMessage = "No se pudo guardar los contactos: \(error.localizedDescription)"
             showErrorAlert = true
