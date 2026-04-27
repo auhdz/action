@@ -20,7 +20,7 @@ struct CornerMapView: View {
             }
         }
         .mapStyle(.standard(elevation: .flat))
-        .mapControls(.hidden)
+        .mapControls { }
         .onChange(of: location?.coordinate.latitude) { _, _ in
             updateCamera()
         }

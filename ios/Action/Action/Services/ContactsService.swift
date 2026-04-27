@@ -43,7 +43,7 @@ final class ContactsService: NSObject, ObservableObject {
                     }
                 }
             }
-        case .authorized:
+        case .authorized, .limited:
             Task {
                 await fetchAllContacts()
             }

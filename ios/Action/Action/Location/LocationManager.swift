@@ -39,19 +39,24 @@ final class LocationManager: NSObject, ObservableObject {
 }
 
 extension LocationManager: CLLocationManagerDelegate {
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-        if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
-            start()
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        Task { @MainActor [weak self] in
+            self?.authorizationStatus = status
+            if status == .authorizedWhenInUse || status == .authorizedAlways {
+                self?.start()
+            }
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        location = locations.last
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let last = locations.last
+        Task { @MainActor [weak self] in
+            self?.location = last
+        }
     }
 
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // Surface via logger only; UI can add @Published error later if needed.
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         #if DEBUG
         print("Location error: \(error.localizedDescription)")
         #endif
