@@ -49,8 +49,8 @@ struct ContactPickerView: View {
                     }
 
                     Text(lang.isSpanish
-                         ? "Para tu seguridad, te recomendamos agregar al menos un contacto de confianza."
-                         : "For your safety, we recommend adding at least one trusted contact.")
+                         ? "Las personas que agregues aquí recibirán tu ubicación si activas una alerta. No necesitan descargar ninguna app. Agrega solo a personas de plena confianza."
+                         : "The people you add here will receive your location if you activate a safety alert. They do not need to download any app. Only add people you fully trust.")
                         .font(.system(size: 14, weight: .regular))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)

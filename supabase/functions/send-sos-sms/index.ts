@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Type definitions
+// ─── Type Definitions ────────────────────────────────────────────────────────
+
 interface WebhookPayload {
   type: "INSERT" | "UPDATE" | "DELETE";
   table: string;
@@ -25,14 +26,25 @@ interface TrustedContact {
   created_at: string;
 }
 
-interface ViewerToken {
-  id: string;
-  user_id: string;
-  token: string;
-  created_at: string;
-}
+// ─── Approved SMS Templates (never reference ICE, immigration, enforcement) ──
 
-// Initialize Supabase client
+const SMS = {
+  alert: {
+    en: (name: string, link: string) =>
+      `${name} needs you. They've shared their live location:\n${link}\n\nOpen the link to see where they are right now.`,
+    es: (name: string, link: string) =>
+      `${name} necesita tu ayuda. Compartieron su ubicación:\n${link}\n\nAbre el enlace para ver dónde están ahora.`,
+  },
+  cancel: {
+    en: (name: string) =>
+      `Update from ${name}: They are safe. No action needed.\nThis was a false alarm. You can ignore the previous message.`,
+    es: (name: string) =>
+      `Actualización de ${name}: Están bien. No se necesita acción.\nFue una falsa alarma. Puedes ignorar el mensaje anterior.`,
+  },
+} as const;
+
+// ─── Supabase Client ──────────────────────────────────────────────────────────
+
 const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -42,7 +54,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Twilio configuration
+// ─── Twilio Configuration ─────────────────────────────────────────────────────
+
 const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
 const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
@@ -53,13 +66,16 @@ if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
   );
 }
 
-// Web viewer base URL (can be configured as environment variable)
-const viewerBaseUrl =
-  Deno.env.get("VIEWER_BASE_URL") || "https://action-viewer.vercel.app";
+// ─── Viewer URL ───────────────────────────────────────────────────────────────
 
-/**
- * Send SMS via Twilio
- */
+const viewerBaseUrl = Deno.env.get("VIEWER_BASE_URL") || "https://accion.app";
+
+function buildViewerLink(token: string): string {
+  return `${viewerBaseUrl}/watch/${token}`;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 async function sendTwilioSMS(
   toPhoneNumber: string,
   message: string
@@ -85,163 +101,108 @@ async function sendTwilioSMS(
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error(
-        `Twilio SMS send failed: ${response.status} ${errorBody}`
-      );
+      console.error(`Twilio SMS failed: ${response.status}`);
+      // Never log errorBody — may contain phone numbers
       return false;
     }
 
     const result = await response.json();
-    console.log(`SMS sent successfully: ${result.sid}`);
+    console.log(`SMS sent: ${result.sid}`);
     return true;
   } catch (error) {
-    console.error("Error sending Twilio SMS:", error);
+    console.error("Twilio send error:", error instanceof Error ? error.message : "unknown");
     return false;
   }
 }
 
-/**
- * Fetch trusted contacts for the user
- */
 async function getTrustedContacts(userId: string): Promise<TrustedContact[]> {
-  try {
-    const { data, error } = await supabase
-      .from("trusted_contacts")
-      .select("*")
-      .eq("user_id", userId);
+  const { data, error } = await supabase
+    .from("trusted_contacts")
+    .select("*")
+    .eq("user_id", userId);
 
-    if (error) {
-      console.error("Error fetching trusted contacts:", error);
-      return [];
-    }
-
-    return (data || []) as TrustedContact[];
-  } catch (error) {
-    console.error("Error in getTrustedContacts:", error);
+  if (error) {
+    console.error("Error fetching contacts:", error.message);
     return [];
   }
+
+  return (data || []) as TrustedContact[];
 }
 
-/**
- * Fetch viewer token for the user
- */
 async function getViewerToken(userId: string): Promise<string | null> {
-  try {
-    const { data, error } = await supabase
-      .from("viewer_tokens")
-      .select("token")
-      .eq("user_id", userId)
-      .single();
+  const { data, error } = await supabase
+    .from("viewer_tokens")
+    .select("token")
+    .eq("user_id", userId)
+    .single();
 
-    if (error) {
-      console.error("Error fetching viewer token:", error);
-      return null;
-    }
-
-    return data?.token || null;
-  } catch (error) {
-    console.error("Error in getViewerToken:", error);
+  if (error) {
+    console.error("Error fetching viewer token:", error.message);
     return null;
   }
+
+  return data?.token || null;
 }
 
-/**
- * Main Edge Function handler
- */
+// ─── Main Handler ─────────────────────────────────────────────────────────────
+
 export default async (req: Request): Promise<Response> => {
   try {
-    // Parse the webhook payload
     const payload = (await req.json()) as WebhookPayload;
 
-    // Only process INSERT events on location_pings
     if (payload.type !== "INSERT" || payload.table !== "location_pings") {
-      return new Response(
-        JSON.stringify({ error: "Unsupported event type or table" }),
-        { status: 400 }
-      );
+      return new Response(JSON.stringify({ message: "Ignored" }), { status: 200 });
     }
 
-    const record = payload.record;
+    const { ping_type, user_id: userId } = payload.record;
 
-    // Only process alert pings
-    if (record.ping_type !== "alert") {
-      return new Response(
-        JSON.stringify({ message: "Not an alert ping, skipping" }),
-        { status: 200 }
-      );
+    if (ping_type !== "alert" && ping_type !== "cancel") {
+      return new Response(JSON.stringify({ message: "Not an alert or cancel ping" }), { status: 200 });
     }
 
-    const userId = record.user_id;
-
-    console.log(
-      `Processing alert ping for user ${userId} at ${record.latitude}, ${record.longitude}`
-    );
-
-    // Fetch trusted contacts and viewer token in parallel
     const [contacts, viewerToken] = await Promise.all([
       getTrustedContacts(userId),
       getViewerToken(userId),
     ]);
 
     if (contacts.length === 0) {
-      console.warn(`No trusted contacts found for user ${userId}`);
-      return new Response(
-        JSON.stringify({
-          message: "No trusted contacts to notify",
-          sentCount: 0,
-        }),
-        { status: 200 }
-      );
+      console.warn(`No trusted contacts for user ${userId}`);
+      return new Response(JSON.stringify({ message: "No contacts", sentCount: 0 }), { status: 200 });
     }
 
-    if (!viewerToken) {
-      console.warn(`No viewer token found for user ${userId}`);
-      return new Response(
-        JSON.stringify({
-          message: "No viewer token available",
-          sentCount: 0,
-        }),
-        { status: 200 }
-      );
-    }
+    // Default to English. Add preferred_lang field to user profile to enable per-user language.
+    const lang: "en" | "es" = "en";
 
-    // Build the viewer link
-    const viewerLink = `${viewerBaseUrl}?token=${encodeURIComponent(viewerToken)}`;
-
-    // Send SMS to each contact
     const smsPromises = contacts.map(async (contact) => {
-      const message = `${contact.name} activó una alerta de emergencia. Ve su ubicación: ${viewerLink}`;
+      let message: string;
 
-      console.log(
-        `Sending SMS to ${contact.name} (${contact.phone_number})`
-      );
+      if (ping_type === "cancel") {
+        message = SMS.cancel[lang](contact.name);
+      } else {
+        if (!viewerToken) {
+          console.warn(`No viewer token for user ${userId}`);
+          return false;
+        }
+        const link = buildViewerLink(viewerToken);
+        message = SMS.alert[lang](contact.name, link);
+      }
 
-      return await sendTwilioSMS(contact.phone_number, message);
+      // Log contact name only — never log phone numbers or message content
+      console.log(`Sending ${ping_type} SMS to contact: ${contact.name}`);
+      return sendTwilioSMS(contact.phone_number, message);
     });
 
     const results = await Promise.all(smsPromises);
-    const sentCount = results.filter((success) => success).length;
+    const sentCount = results.filter(Boolean).length;
 
-    console.log(
-      `Alert SMS campaign complete: ${sentCount}/${contacts.length} sent`
-    );
+    console.log(`SMS campaign (${ping_type}): ${sentCount}/${contacts.length} sent`);
 
     return new Response(
-      JSON.stringify({
-        message: "Alert SMS sent",
-        sentCount,
-        totalContacts: contacts.length,
-      }),
+      JSON.stringify({ message: `${ping_type} SMS sent`, sentCount, totalContacts: contacts.length }),
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error in send-sos-sms function:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : String(error),
-      }),
-      { status: 500 }
-    );
+    console.error("Edge function error:", error instanceof Error ? error.message : "unknown");
+    return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
   }
 };

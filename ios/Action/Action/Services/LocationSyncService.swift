@@ -71,7 +71,8 @@ final class LocationSyncService: ObservableObject {
             lastError = "No location available"
             throw NSError(domain: "LocationSyncService", code: -1, userInfo: [NSLocalizedDescriptionKey: "No location available"])
         }
-        await sendPing(location: location, now: Date(), pingType: "normal")
+        // "cancel" ping triggers the false-alarm SMS to trusted contacts
+        await sendPing(location: location, now: Date(), pingType: "cancel")
     }
 
     private func sendPing(location: CLLocation, now: Date, pingType: String) async {

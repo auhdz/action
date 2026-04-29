@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var locationManager: LocationManager
     @EnvironmentObject private var syncService: LocationSyncService
+    @EnvironmentObject private var lang: LanguageManager
 
     @State private var sosStartTime: Date?
     @State private var isSosActive = false
@@ -19,11 +20,13 @@ struct ContentView: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Action")
+                Text("Acción")
                     .font(.system(size: 34, weight: .semibold, design: .default))
                     .foregroundStyle(.primary)
 
-                Text("Your corner map and live ping status.")
+                Text(lang.isSpanish
+                     ? "Tu ubicación. Tus contactos de confianza."
+                     : "Your location. Your trusted contacts.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
@@ -70,7 +73,7 @@ struct ContentView: View {
                 Circle()
                     .fill(Color.red)
                     .frame(width: 8, height: 8)
-                Text("ALERTA ACTIVADA")
+                Text(lang.isSpanish ? "ALERTA ACTIVADA" : "ALERT ACTIVE")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.red)
                 Spacer()
@@ -78,7 +81,9 @@ struct ContentView: View {
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.red)
             }
-            Text("Emergencia reportada. Cancelar se enviará dentro de \(sosCountdown) segundos.")
+            Text(lang.isSpanish
+                 ? "Alerta enviada. Tienes \(sosCountdown) segundos para cancelar."
+                 : "Alert sent to your trusted contacts. You have \(sosCountdown) seconds to cancel.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -90,10 +95,8 @@ struct ContentView: View {
     private var sosButton: some View {
         VStack(spacing: 16) {
             if isSosActive {
-                Button(action: {
-                    cancelSOS()
-                }) {
-                    Text("Cancelar")
+                Button(action: { cancelSOS() }) {
+                    Text(lang.isSpanish ? "Cancelar alerta" : "Cancel Alert")
                         .font(.system(size: 16, weight: .semibold, design: .default))
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
@@ -137,15 +140,21 @@ struct ContentView: View {
                 .scaleEffect(1 + sosHoldProgress * 0.1)
                 .opacity(1 - sosHoldProgress)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Text("EMERGENCIA")
                     .font(.system(size: 16, weight: .bold, design: .default))
                     .foregroundStyle(.white)
 
                 if sosHoldProgress > 0 {
-                    Text("\(Int((1 - sosHoldProgress) * sosHoldDuration * 10)) / 30")
+                    Text(lang.isSpanish ? "Alertando contactos…" : "Alerting contacts…")
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.white.opacity(0.9))
+                } else {
+                    Text(lang.isSpanish
+                         ? "Mantén 3s para alertar tus contactos"
+                         : "Hold 3s to alert your trusted contacts")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.75))
                 }
             }
         }
@@ -289,10 +298,12 @@ struct ContentView: View {
 
 private struct PreviewContentContainer: View {
     @StateObject private var model = AppModel()
+    @StateObject private var lang = LanguageManager()
 
     var body: some View {
         ContentView()
             .environmentObject(model.locationManager)
             .environmentObject(model.syncService)
+            .environmentObject(lang)
     }
 }
