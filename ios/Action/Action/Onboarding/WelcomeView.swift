@@ -3,6 +3,7 @@ import SwiftUI
 struct WelcomeView: View {
     @ObservedObject var onboardingState: OnboardingState
     @EnvironmentObject var lang: LanguageManager
+    @AppStorage("userName") private var userName = ""
 
     var body: some View {
         ZStack {
@@ -60,6 +61,25 @@ struct WelcomeView: View {
                     )
                 }
                 .padding(.horizontal, 24)
+
+                // Name input
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(lang.isSpanish ? "¿Cómo te llamas?" : "What's your first name?")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 24)
+                    TextField(lang.isSpanish ? "Tu nombre" : "Your first name", text: $userName)
+                        .font(.system(size: 16))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.black.opacity(0.08), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 24)
+                }
 
                 Spacer()
 

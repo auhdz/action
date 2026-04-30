@@ -5,6 +5,8 @@ struct ContentView: View {
     @EnvironmentObject private var syncService: LocationSyncService
     @EnvironmentObject private var lang: LanguageManager
 
+    @AppStorage("userName") private var userName = ""
+
     @State private var sosStartTime: Date?
     @State private var isSosActive = false
     @State private var sosCountdown: Int = 60
@@ -17,27 +19,35 @@ struct ContentView: View {
     private let sosHoldDuration: Double = 3.0
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack {
             Color.safeCream
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 14) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Acción")
-                        .font(.system(size: 30, weight: .semibold))
-                        .foregroundStyle(Color.trustNavy)
-                    Text(timeBasedGreeting)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                // Title row with language toggle
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Acción")
+                            .font(.system(size: 30, weight: .semibold))
+                            .foregroundStyle(Color.trustNavy)
+                        Text(timeBasedGreeting)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    LanguageToggle()
                 }
-                .padding(.trailing, 196)
 
-                if isSosActive {
-                    alertBanner
+                // Safety status card or SOS states
+                if isSosActive && smsPending {
+                    sosPendingCard
+                } else if isSosActive && !smsPending {
+                    sosSentCard
                 } else {
                     safetyStatusCard
                 }
 
+                // Know Your Rights — Cards Against Humanity style
                 kyrCard
 
                 Spacer(minLength: 0)
@@ -51,67 +61,62 @@ struct ContentView: View {
             .onAppear {
                 locationManager.requestAuthorizationIfNeeded()
             }
+        }
+    }
+
+    // MARK: - Safety Status Card (map inside)
+
+    private var safetyStatusCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(locationStatusColor)
+                        .frame(width: 8, height: 8)
+                    Text(lang.isSpanish ? "Estás protegido" : "You are safe")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                    Spacer()
+                }
+                if let detail = locationStatusDetail {
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 14)
+            .padding(.bottom, 12)
 
             CornerMapView(
                 location: locationManager.location,
                 annotationProvider: annotationProvider
             )
-            .frame(width: 180, height: 160)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(Color.black.opacity(0.06), lineWidth: 1)
-            }
-            .shadow(color: Color.black.opacity(0.08), radius: 10, y: 4)
-            .padding(.trailing, 16)
-            .padding(.top, 16)
+            .frame(maxWidth: .infinity)
+            .frame(height: 130)
         }
-    }
-
-    // MARK: - Subviews
-
-    private var safetyStatusCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(locationStatusColor)
-                    .frame(width: 8, height: 8)
-                Text(lang.isSpanish ? "Estás protegido" : "You are safe")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white)
-                Spacer()
-            }
-            if let detail = locationStatusDetail {
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
-            }
-            if let err = syncService.lastError {
-                Text(err)
-                    .font(.caption)
-                    .foregroundStyle(Color.safetyOrange)
-            }
-        }
-        .padding(16)
         .background(Color.trustNavy)
-        .cornerRadius(14)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
+
+    // MARK: - Know Your Rights Card (Cards Against Humanity style)
 
     private var kyrCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 6) {
                 Image(systemName: "shield.fill")
-                    .font(.system(size: 12))
-                    .foregroundColor(Color.actionRed)
-                Text(lang.isSpanish ? "Tus derechos" : "Know Your Rights")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.trustNavy)
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.7))
+                Text(lang.isSpanish ? "TUS DERECHOS" : "KNOW YOUR RIGHTS")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .tracking(1.5)
                 Spacer()
             }
 
             kyrScenarioPicker
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 ForEach(kyrItems, id: \.phrase) { item in
                     KYRItem(phrase: item.phrase, detail: item.detail)
                 }
@@ -123,12 +128,12 @@ struct ContentView: View {
                 Text(lang.isSpanish
                      ? "Estoy siendo detenido — alertar a mis contactos"
                      : "I am being detained — alert my contacts")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color.actionRed)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: 40)
-                    .background(Color.actionRed.opacity(0.07))
+                    .frame(minHeight: 44)
+                    .background(Color.actionRed)
                     .cornerRadius(8)
             }
 
@@ -136,16 +141,12 @@ struct ContentView: View {
                  ? "Fuente: CHIRLA — chirla.org · Línea de ayuda: 888-624-4752"
                  : "Source: CHIRLA — chirla.org · Hotline: 888-624-4752")
                 .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.white.opacity(0.3))
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(16)
-        .background(Color.white)
-        .cornerRadius(14)
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.black.opacity(0.07), lineWidth: 1)
-        )
+        .background(Color(red: 0.07, green: 0.07, blue: 0.07))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var kyrScenarioPicker: some View {
@@ -158,16 +159,16 @@ struct ContentView: View {
                         Text(scenario.label(isSpanish: lang.isSpanish))
                             .font(.system(size: 12, weight: .semibold))
                     }
-                    .foregroundColor(kyrScenario == scenario ? Color.actionRed : .secondary)
+                    .foregroundColor(kyrScenario == scenario ? Color(red: 0.07, green: 0.07, blue: 0.07) : .white.opacity(0.5))
                     .frame(maxWidth: .infinity)
                     .frame(height: 32)
-                    .background(kyrScenario == scenario ? Color.actionRed.opacity(0.09) : Color.clear)
+                    .background(kyrScenario == scenario ? Color.white : Color.clear)
                     .cornerRadius(6)
                 }
             }
         }
         .padding(3)
-        .background(Color.black.opacity(0.05))
+        .background(Color.white.opacity(0.08))
         .cornerRadius(8)
     }
 
@@ -236,36 +237,102 @@ struct ContentView: View {
         }
     }
 
-    private var alertBanner: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 8) {
+    // MARK: - SOS Pending Card (countdown with cancel)
+
+    private var sosPendingCard: some View {
+        VStack(spacing: 18) {
+            ZStack {
                 Circle()
-                    .fill(smsPending ? Color.safetyOrange : Color.actionRed)
-                    .frame(width: 8, height: 8)
-                Text(smsPending
-                     ? (lang.isSpanish ? "ENVIANDO EN \(sosCountdown)s" : "SENDING IN \(sosCountdown)s")
-                     : (lang.isSpanish ? "ALERTA ENVIADA" : "ALERT SENT"))
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(smsPending ? Color.safetyOrange : Color.actionRed)
-                Spacer()
-                Text("\(sosCountdown)s")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(smsPending ? Color.safetyOrange : Color.actionRed)
+                    .stroke(Color.white.opacity(0.12), lineWidth: 7)
+                    .frame(width: 96, height: 96)
+                Circle()
+                    .trim(from: 0, to: CGFloat(sosCountdown) / 60.0)
+                    .stroke(
+                        sosCountdown > 20 ? Color.safetyOrange : Color.actionRed,
+                        style: StrokeStyle(lineWidth: 7, lineCap: .round)
+                    )
+                    .frame(width: 96, height: 96)
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 1), value: sosCountdown)
+                VStack(spacing: 1) {
+                    Text("\(sosCountdown)")
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundStyle(.white)
+                        .contentTransition(.numericText())
+                    Text(lang.isSpanish ? "seg." : "sec.")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
             }
-            Text(smsPending
-                 ? (lang.isSpanish
-                    ? "Tus contactos serán notificados en \(sosCountdown) segundos. Cancela para detener."
-                    : "Your contacts will be notified in \(sosCountdown) seconds. Cancel to stop.")
-                 : (lang.isSpanish
-                    ? "Tus contactos fueron notificados con tu ubicación."
-                    : "Your trusted contacts have been sent your location."))
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+            VStack(spacing: 5) {
+                Text(lang.isSpanish ? "Enviando alerta…" : "Sending alert…")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text(lang.isSpanish
+                     ? "Tu ubicación se enviará a tus contactos cuando termine la cuenta regresiva."
+                     : "Your location will be sent to your contacts when the countdown ends.")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white.opacity(0.55))
+                    .multilineTextAlignment(.center)
+            }
+
+            Button(action: { cancelSOS() }) {
+                Text(lang.isSpanish ? "Cancelar — estoy bien" : "Cancel — I'm safe")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Color.white.opacity(0.12))
+                    .cornerRadius(10)
+            }
         }
-        .padding(12)
-        .background((smsPending ? Color.safetyOrange : Color.actionRed).opacity(0.08))
-        .cornerRadius(10)
+        .padding(20)
+        .background(Color.trustNavy)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
+
+    // MARK: - SOS Sent Confirmation Card
+
+    private var sosSentCard: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(Color.actionRed.opacity(0.18))
+                    .frame(width: 64, height: 64)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundColor(Color.actionRed)
+            }
+
+            VStack(spacing: 6) {
+                Text(lang.isSpanish ? "Alerta enviada" : "Alert sent")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.white)
+                Text(lang.isSpanish
+                     ? "Tu ubicación fue enviada a tus contactos. La ayuda está en camino."
+                     : "Your location was sent to your contacts. Help is on the way.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .multilineTextAlignment(.center)
+            }
+
+            Button(action: { resetSOS() }) {
+                Text(lang.isSpanish ? "Entendido" : "Got it")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(Color.actionRed)
+                    .cornerRadius(10)
+            }
+        }
+        .padding(20)
+        .background(Color.trustNavy)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    // MARK: - SOS Button
 
     private var sosButton: some View {
         VStack(spacing: 16) {
@@ -340,11 +407,13 @@ struct ContentView: View {
 
     private var timeBasedGreeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
+        let prefix: String
         switch hour {
-        case 5..<12: return lang.isSpanish ? "Buenos días" : "Good morning"
-        case 12..<17: return lang.isSpanish ? "Buenas tardes" : "Good afternoon"
-        default:      return lang.isSpanish ? "Buenas noches" : "Good evening"
+        case 5..<12: prefix = lang.isSpanish ? "Buenos días" : "Good morning"
+        case 12..<17: prefix = lang.isSpanish ? "Buenas tardes" : "Good afternoon"
+        default:      prefix = lang.isSpanish ? "Buenas noches" : "Good evening"
         }
+        return userName.isEmpty ? prefix : "\(prefix), \(userName)"
     }
 
     private var locationStatusColor: Color {
@@ -367,7 +436,7 @@ struct ContentView: View {
         case .denied, .restricted:
             return lang.isSpanish
                 ? "Activa la ubicación en Ajustes."
-                : "Enable location in Settings to share pings."
+                : "Enable location in Settings."
         case .notDetermined:
             return lang.isSpanish ? "Toca Permitir cuando se solicite." : "Tap Allow when prompted."
         @unknown default:
@@ -468,19 +537,18 @@ private struct KYRItem: View {
     let detail: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Circle()
-                .fill(Color.actionRed.opacity(0.5))
-                .frame(width: 5, height: 5)
-                .padding(.top, 5)
-            VStack(alignment: .leading, spacing: 2) {
+        HStack(alignment: .top, spacing: 10) {
+            Text("—")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Color.actionRed)
+            VStack(alignment: .leading, spacing: 3) {
                 Text(phrase)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.trustNavy)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(detail)
                     .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.5))
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
