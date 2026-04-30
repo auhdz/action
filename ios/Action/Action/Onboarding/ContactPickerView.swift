@@ -89,7 +89,10 @@ struct ContactPickerView: View {
                                  : "No contacts found with that name")
                                 .font(.system(size: 14))
                                 .foregroundStyle(.tertiary)
-                        } else if contactsService.authorizationStatus != .authorized && contactsService.authorizationStatus != .limited {
+                        } else if contactsService.authorizationStatus != .authorized && !{
+                            if #available(iOS 18.0, *) { return contactsService.authorizationStatus == .limited }
+                            return false
+                        }() {
                             Text(lang.isSpanish
                                  ? "Permite el acceso a contactos en Ajustes"
                                  : "Allow contacts access in Settings")

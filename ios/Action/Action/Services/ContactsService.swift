@@ -43,10 +43,13 @@ final class ContactsService: NSObject, ObservableObject {
                     }
                 }
             }
-        case .authorized, .limited:
-            Task {
-                await fetchAllContacts()
-            }
+        case .authorized:
+            Task { await fetchAllContacts() }
+        case _ where {
+            if #available(iOS 18.0, *) { return authorizationStatus == .limited }
+            return false
+        }():
+            Task { await fetchAllContacts() }
         case .denied, .restricted:
             break
         @unknown default:
@@ -57,7 +60,9 @@ final class ContactsService: NSObject, ObservableObject {
     // MARK: - Fetch Contacts
 
     func fetchAllContacts() async -> [TrustedContact] {
-        guard authorizationStatus == .authorized || authorizationStatus == .limited else {
+        let isLimited: Bool
+        if #available(iOS 18.0, *) { isLimited = authorizationStatus == .limited } else { isLimited = false }
+        guard authorizationStatus == .authorized || isLimited else {
             #if DEBUG
             print("Contacts: not authorized")
             #endif

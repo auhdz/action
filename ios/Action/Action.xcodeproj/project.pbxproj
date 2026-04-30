@@ -35,10 +35,10 @@
 		8ED7F50292145C5966A98218 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A249D4B4273002424B61BB7F /* Action.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Action.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2C3D4E5F6A7B8C9D0E1F2A3 /* ViewerTokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerTokenService.swift; sourceTree = "<group>"; };
-		BC05D9542F9F3CE900736395 /* ContactPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPickerView.swift; sourceTree = "<group>"; };
-		BC05D9552F9F3CE900736395 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		BC05D9562F9F3CE900736395 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
-		BC05D95A2F9F3DED00736395 /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsService.swift; sourceTree = "<group>"; };
+		BC05D9542F9F3CE900736395 /* ContactPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action/Onboarding/ContactPickerView.swift"; sourceTree = "<group>"; };
+		BC05D9552F9F3CE900736395 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action/Onboarding/OnboardingView.swift"; sourceTree = "<group>"; };
+		BC05D9562F9F3CE900736395 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action/Onboarding/WelcomeView.swift"; sourceTree = "<group>"; };
+		BC05D95A2F9F3DED00736395 /* ContactsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action/Services/ContactsService.swift"; sourceTree = "<group>"; };
 		CD15E1447DACB3689510317B /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		CFDAC165A3D784E926B66F0C /* ActionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionApp.swift; sourceTree = "<group>"; };
 		DC3F3C46F092B0C1FB3A2F2D /* LocationSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSyncService.swift; sourceTree = "<group>"; };
