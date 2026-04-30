@@ -10,39 +10,38 @@ struct ContentView: View {
     @State private var sosCountdown: Int = 60
     @State private var sosHoldProgress: Double = 0
     @State private var timer: Timer?
-    @State private var smsPending = false  // true while counting down before SMS fires
+    @State private var smsPending = false
 
     private let annotationProvider: MapAnnotationProviding = EmptyMapAnnotationProvider()
     private let sosHoldDuration: Double = 3.0
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Color.white
+            Color.safeCream
                 .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Acción")
-                    .font(.system(size: 34, weight: .semibold, design: .default))
-                    .foregroundStyle(.primary)
-
-                Text(lang.isSpanish
-                     ? "Tu ubicación. Tus contactos de confianza."
-                     : "Your location. Your trusted contacts.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Acción")
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(Color.trustNavy)
+                    Text(timeBasedGreeting)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.trailing, 196)
 
                 if isSosActive {
                     alertBanner
-                        .padding(.top, 8)
                 } else {
-                    statusSection
-                        .padding(.top, 8)
+                    safetyStatusCard
                 }
+
+                kyrCard
 
                 Spacer(minLength: 0)
 
                 sosButton
-                    .padding(.horizontal, 24)
                     .padding(.bottom, 24)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -68,21 +67,98 @@ struct ContentView: View {
         }
     }
 
+    // MARK: - Subviews
+
+    private var safetyStatusCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(locationStatusColor)
+                    .frame(width: 8, height: 8)
+                Text(lang.isSpanish ? "Estás protegido" : "You are safe")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                Spacer()
+            }
+            if let detail = locationStatusDetail {
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            if let err = syncService.lastError {
+                Text(err)
+                    .font(.caption)
+                    .foregroundStyle(Color.safetyOrange)
+            }
+        }
+        .padding(16)
+        .background(Color.trustNavy)
+        .cornerRadius(14)
+    }
+
+    private var kyrCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "shield.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(Color.actionRed)
+                Text(lang.isSpanish ? "Tus derechos" : "Know Your Rights")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.trustNavy)
+                Spacer()
+            }
+
+            VStack(alignment: .leading, spacing: 7) {
+                KYRItem(lang.isSpanish
+                    ? "\"No doy mi consentimiento a un registro.\""
+                    : "\"I do not consent to a search.\"")
+                KYRItem(lang.isSpanish
+                    ? "Tienes derecho a guardar silencio."
+                    : "You have the right to remain silent.")
+                KYRItem(lang.isSpanish
+                    ? "Tienes derecho a hablar con un abogado."
+                    : "You have the right to speak to a lawyer.")
+            }
+
+            Button(action: {
+                Task { await activateSOS() }
+            }) {
+                Text(lang.isSpanish
+                     ? "Estoy siendo detenido — alertar a mis contactos"
+                     : "I am being detained — alert my contacts")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Color.actionRed)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 40)
+                    .background(Color.actionRed.opacity(0.07))
+                    .cornerRadius(8)
+            }
+        }
+        .padding(16)
+        .background(Color.white)
+        .cornerRadius(14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.black.opacity(0.07), lineWidth: 1)
+        )
+    }
+
     private var alertBanner: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Circle()
-                    .fill(smsPending ? Color.orange : Color.red)
+                    .fill(smsPending ? Color.safetyOrange : Color.actionRed)
                     .frame(width: 8, height: 8)
                 Text(smsPending
                      ? (lang.isSpanish ? "ENVIANDO EN \(sosCountdown)s" : "SENDING IN \(sosCountdown)s")
                      : (lang.isSpanish ? "ALERTA ENVIADA" : "ALERT SENT"))
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(smsPending ? .orange : .red)
+                    .foregroundStyle(smsPending ? Color.safetyOrange : Color.actionRed)
                 Spacer()
                 Text("\(sosCountdown)s")
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(smsPending ? .orange : .red)
+                    .foregroundStyle(smsPending ? Color.safetyOrange : Color.actionRed)
             }
             Text(smsPending
                  ? (lang.isSpanish
@@ -95,8 +171,8 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .background((smsPending ? Color.orange : Color.red).opacity(0.08))
-        .cornerRadius(8)
+        .background((smsPending ? Color.safetyOrange : Color.actionRed).opacity(0.08))
+        .cornerRadius(10)
     }
 
     private var sosButton: some View {
@@ -107,7 +183,7 @@ struct ContentView: View {
                         .font(.system(size: 16, weight: .semibold, design: .default))
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color.red)
+                        .background(Color.actionRed)
                         .foregroundStyle(.white)
                         .cornerRadius(12)
                 }
@@ -131,19 +207,17 @@ struct ContentView: View {
             }
             .onEnded { success in
                 if success {
-                    Task {
-                        await activateSOS()
-                    }
+                    Task { await activateSOS() }
                 }
                 resetHoldState()
             }
 
         return ZStack(alignment: .center) {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.red)
+                .fill(Color.actionRed)
 
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.red.opacity(0.3), lineWidth: 4)
+                .strokeBorder(Color.actionRed.opacity(0.3), lineWidth: 4)
                 .scaleEffect(1 + sosHoldProgress * 0.1)
                 .opacity(1 - sosHoldProgress)
 
@@ -170,54 +244,23 @@ struct ContentView: View {
         .gesture(gesture)
     }
 
-    private var statusSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(locationStatusColor)
-                    .frame(width: 8, height: 8)
-                Text(locationStatusTitle)
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(.secondary)
-            }
+    // MARK: - Computed Properties
 
-            if let detail = locationStatusDetail {
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
-
-            if let err = syncService.lastError {
-                Text(err)
-                    .font(.caption)
-                    .foregroundStyle(.red.opacity(0.85))
-            }
-        }
-    }
-
-    private var locationStatusTitle: String {
-        switch locationManager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            return "Location on"
-        case .denied, .restricted:
-            return "Location denied"
-        case .notDetermined:
-            return "Location permission needed"
-        @unknown default:
-            return "Location unknown"
+    private var timeBasedGreeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 5..<12: return lang.isSpanish ? "Buenos días" : "Good morning"
+        case 12..<17: return lang.isSpanish ? "Buenas tardes" : "Good afternoon"
+        default:      return lang.isSpanish ? "Buenas noches" : "Good evening"
         }
     }
 
     private var locationStatusColor: Color {
         switch locationManager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            return .green.opacity(0.85)
-        case .denied, .restricted:
-            return .orange
-        case .notDetermined:
-            return .gray
-        @unknown default:
-            return .gray
+        case .authorizedAlways, .authorizedWhenInUse: return .green.opacity(0.85)
+        case .denied, .restricted:                    return Color.safetyOrange
+        case .notDetermined:                          return .gray
+        @unknown default:                             return .gray
         }
     }
 
@@ -225,24 +268,28 @@ struct ContentView: View {
         switch locationManager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             if let last = syncService.lastSuccessfulPing {
-                return "Last ping \(RelativeDateTimeFormatter().localizedString(for: last, relativeTo: Date()))"
+                let rel = RelativeDateTimeFormatter().localizedString(for: last, relativeTo: Date())
+                return lang.isSpanish ? "Último ping \(rel)" : "Last ping \(rel)"
             }
-            return "Waiting for GPS…"
+            return lang.isSpanish ? "Esperando GPS…" : "Waiting for GPS…"
         case .denied, .restricted:
-            return "Enable location in Settings to share pings."
+            return lang.isSpanish
+                ? "Activa la ubicación en Ajustes."
+                : "Enable location in Settings to share pings."
         case .notDetermined:
-            return "Tap Allow when prompted."
+            return lang.isSpanish ? "Toca Permitir cuando se solicite." : "Tap Allow when prompted."
         @unknown default:
             return nil
         }
     }
+
+    // MARK: - SOS Logic
 
     private func startHoldAnimation() {
         var progress: Double = 0
         timer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
             progress += (0.016 / sosHoldDuration)
             sosHoldProgress = min(progress, 1.0)
-
             if sosHoldProgress >= 1.0 {
                 timer?.invalidate()
                 timer = nil
@@ -258,8 +305,6 @@ struct ContentView: View {
     }
 
     private func activateSOS() async {
-        // Start 60s countdown — SMS fires AFTER countdown expires, not immediately.
-        // Cancel within 60s = no SMS sent at all.
         isSosActive = true
         smsPending = true
         sosCountdown = 60
@@ -271,7 +316,6 @@ struct ContentView: View {
             if sosCountdown > 0 {
                 sosCountdown -= 1
             } else {
-                // Countdown expired — now fire the alert ping and SMS
                 Task { await fireSOS() }
             }
         }
@@ -290,7 +334,6 @@ struct ContentView: View {
     }
 
     private func cancelSOS() {
-        // Cancelled before SMS fired — no ping inserted, no SMS sent
         resetSOS()
     }
 
@@ -303,6 +346,28 @@ struct ContentView: View {
         timer = nil
     }
 }
+
+// MARK: - KYRItem
+
+private struct KYRItem: View {
+    let text: String
+    init(_ text: String) { self.text = text }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Circle()
+                .fill(Color.actionRed.opacity(0.5))
+                .frame(width: 5, height: 5)
+                .padding(.top, 6)
+            Text(text)
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+// MARK: - Preview
 
 #Preview {
     PreviewContentContainer()

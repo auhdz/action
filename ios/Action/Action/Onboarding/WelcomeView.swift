@@ -6,7 +6,7 @@ struct WelcomeView: View {
 
     var body: some View {
         ZStack {
-            Color.white
+            Color.safeCream
                 .ignoresSafeArea()
 
             VStack(spacing: 32) {
@@ -64,14 +64,14 @@ struct WelcomeView: View {
                 Spacer()
 
                 Button(action: {
-                    onboardingState.step = .contacts
+                    onboardingState.step = .tos
                 }) {
                     Text(lang.isSpanish ? "Continuar" : "Continue")
                         .font(.system(size: 16, weight: .semibold, design: .default))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
-                        .background(Color(red: 0.0, green: 0.45, blue: 0.90))
+                        .background(Color.actionRed)
                         .cornerRadius(12)
                 }
                 .padding(.horizontal, 24)
@@ -92,7 +92,7 @@ struct FeatureCard: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 24))
-                .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
+                .foregroundColor(Color.actionRed)
                 .frame(width: 40, alignment: .center)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -109,7 +109,7 @@ struct FeatureCard: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
-        .background(Color(red: 0.0, green: 0.45, blue: 0.90).opacity(0.05))
+        .background(Color.actionRed.opacity(0.05))
         .cornerRadius(12)
     }
 }
@@ -138,9 +138,9 @@ struct LanguageToggle: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(Color(red: 0.0, green: 0.45, blue: 0.90).opacity(0.1))
+            .background(Color.actionRed.opacity(0.1))
             .cornerRadius(8)
-            .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
+            .foregroundColor(Color.actionRed)
         }
     }
 }

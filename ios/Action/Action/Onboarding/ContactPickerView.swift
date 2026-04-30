@@ -35,7 +35,7 @@ struct ContactPickerView: View {
 
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color.safeCream.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header
@@ -132,7 +132,7 @@ struct ContactPickerView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(Color(red: 0.0, green: 0.45, blue: 0.90))
+                    .background(Color.actionRed)
                     .cornerRadius(12)
                     .opacity(isSaving ? 0.6 : 1.0)
                 }
@@ -220,10 +220,10 @@ struct ContactRow: View {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(Color(red: 0.0, green: 0.45, blue: 0.90).opacity(0.1))
+                        .fill(Color.actionRed.opacity(0.1))
                     Text(contact.name.prefix(1).uppercased())
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
+                        .foregroundColor(Color.actionRed)
                 }
                 .frame(width: 44, height: 44)
 
@@ -241,7 +241,7 @@ struct ContactRow: View {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 24))
                     .foregroundColor(isSelected
-                        ? Color(red: 0.0, green: 0.45, blue: 0.90)
+                        ? Color.actionRed
                         : Color(UIColor.tertiaryLabel))
             }
             .padding(12)

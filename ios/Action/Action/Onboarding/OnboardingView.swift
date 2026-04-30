@@ -72,7 +72,7 @@ struct TOSView: View {
 
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color.safeCream.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 HStack {
@@ -102,7 +102,7 @@ struct TOSView: View {
                                     Text(isPositive ? "✓" : "✗")
                                         .font(.system(size: 14, weight: .semibold))
                                         .foregroundColor(isPositive
-                                            ? Color(red: 0.0, green: 0.45, blue: 0.90)
+                                            ? Color.actionRed
                                             : .red)
                                         .frame(width: 16)
                                     Text(text)
@@ -133,13 +133,13 @@ struct TOSView: View {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 4)
                                     .stroke(agreed
-                                        ? Color(red: 0.0, green: 0.45, blue: 0.90)
+                                        ? Color.actionRed
                                         : Color.gray.opacity(0.4), lineWidth: 1.5)
                                     .frame(width: 22, height: 22)
                                 if agreed {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 13, weight: .bold))
-                                        .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
+                                        .foregroundColor(Color.actionRed)
                                 }
                             }
                             Text(lang.isSpanish
@@ -158,7 +158,7 @@ struct TOSView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                             .background(agreed
-                                ? Color(red: 0.0, green: 0.45, blue: 0.90)
+                                ? Color.actionRed
                                 : Color.gray.opacity(0.3))
                             .cornerRadius(12)
                     }
@@ -181,7 +181,7 @@ struct LocationPermissionView: View {
 
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color.safeCream.ignoresSafeArea()
 
             VStack(spacing: 24) {
                 HStack {
@@ -196,7 +196,7 @@ struct LocationPermissionView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "location.circle.fill")
                         .font(.system(size: 60))
-                        .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
+                        .foregroundColor(Color.actionRed)
 
                     VStack(spacing: 12) {
                         Text(lang.isSpanish ? "Acceso a ubicación" : "Location Access")
@@ -228,17 +228,17 @@ struct LocationPermissionView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color(red: 0.0, green: 0.45, blue: 0.90))
+                            .background(Color.actionRed)
                             .cornerRadius(12)
                     }
 
                     Button(action: { onboardingState.step = .complete }) {
                         Text(lang.isSpanish ? "Más tarde" : "Not Now")
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color(red: 0.0, green: 0.45, blue: 0.90))
+                            .foregroundColor(Color.actionRed)
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
-                            .background(Color(red: 0.0, green: 0.45, blue: 0.90).opacity(0.1))
+                            .background(Color.actionRed.opacity(0.1))
                             .cornerRadius(12)
                     }
                 }
