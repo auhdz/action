@@ -108,16 +108,39 @@ struct ContentView: View {
                 Spacer()
             }
 
-            VStack(alignment: .leading, spacing: 7) {
-                KYRItem(lang.isSpanish
-                    ? "\"No doy mi consentimiento a un registro.\""
-                    : "\"I do not consent to a search.\"")
-                KYRItem(lang.isSpanish
-                    ? "Tienes derecho a guardar silencio."
-                    : "You have the right to remain silent.")
-                KYRItem(lang.isSpanish
-                    ? "Tienes derecho a hablar con un abogado."
-                    : "You have the right to speak to a lawyer.")
+            VStack(alignment: .leading, spacing: 8) {
+                KYRItem(
+                    phrase: lang.isSpanish
+                        ? "\"Me acojo a mi derecho a guardar silencio.\""
+                        : "\"I choose to remain silent.\"",
+                    detail: lang.isSpanish
+                        ? "No tienes que contestar preguntas sobre tu origen o estatus."
+                        : "You don't have to answer questions about origin or status."
+                )
+                KYRItem(
+                    phrase: lang.isSpanish
+                        ? "\"No doy mi consentimiento a un registro.\""
+                        : "\"I do not consent to a search.\"",
+                    detail: lang.isSpanish
+                        ? "Puedes negarte a registros de tu persona o propiedad."
+                        : "You can refuse searches of your person or property."
+                )
+                KYRItem(
+                    phrase: lang.isSpanish
+                        ? "\"Quiero hablar con un abogado.\""
+                        : "\"I want to speak to a lawyer.\"",
+                    detail: lang.isSpanish
+                        ? "No firmes nada sin hablar con un abogado primero."
+                        : "Don't sign anything without speaking to a lawyer first."
+                )
+                KYRItem(
+                    phrase: lang.isSpanish
+                        ? "ICE no puede entrar sin una orden judicial."
+                        : "ICE cannot enter without a judicial warrant.",
+                    detail: lang.isSpanish
+                        ? "Un documento de ICE NO es una orden judicial. No abras la puerta."
+                        : "An ICE document is NOT a judicial warrant. Don't open the door."
+                )
             }
 
             Button(action: {
@@ -134,6 +157,11 @@ struct ContentView: View {
                     .background(Color.actionRed.opacity(0.07))
                     .cornerRadius(8)
             }
+
+            Text(lang.isSpanish ? "Fuente: CHIRLA — chirla.org · Línea de ayuda: 888-624-4752" : "Source: CHIRLA — chirla.org · Hotline: 888-624-4752")
+                .font(.system(size: 10))
+                .foregroundStyle(.tertiary)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(16)
         .background(Color.white)
@@ -350,19 +378,25 @@ struct ContentView: View {
 // MARK: - KYRItem
 
 private struct KYRItem: View {
-    let text: String
-    init(_ text: String) { self.text = text }
+    let phrase: String
+    let detail: String
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Circle()
                 .fill(Color.actionRed.opacity(0.5))
                 .frame(width: 5, height: 5)
-                .padding(.top, 6)
-            Text(text)
-                .font(.system(size: 13))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 5)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(phrase)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.trustNavy)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(detail)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }
