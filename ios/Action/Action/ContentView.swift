@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var sosCountdown: Int = 60
     @State private var sosHoldProgress: Double = 0
     @State private var timer: Timer?
+    @State private var smsPending = false  // true while counting down before SMS fires
 
     private let annotationProvider: MapAnnotationProviding = EmptyMapAnnotationProvider()
     private let sosHoldDuration: Double = 3.0
@@ -71,24 +72,30 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Circle()
-                    .fill(Color.red)
+                    .fill(smsPending ? Color.orange : Color.red)
                     .frame(width: 8, height: 8)
-                Text(lang.isSpanish ? "ALERTA ACTIVADA" : "ALERT ACTIVE")
+                Text(smsPending
+                     ? (lang.isSpanish ? "ENVIANDO EN \(sosCountdown)s" : "SENDING IN \(sosCountdown)s")
+                     : (lang.isSpanish ? "ALERTA ENVIADA" : "ALERT SENT"))
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(smsPending ? .orange : .red)
                 Spacer()
                 Text("\(sosCountdown)s")
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(smsPending ? .orange : .red)
             }
-            Text(lang.isSpanish
-                 ? "Alerta enviada. Tienes \(sosCountdown) segundos para cancelar."
-                 : "Alert sent to your trusted contacts. You have \(sosCountdown) seconds to cancel.")
+            Text(smsPending
+                 ? (lang.isSpanish
+                    ? "Tus contactos serán notificados en \(sosCountdown) segundos. Cancela para detener."
+                    : "Your contacts will be notified in \(sosCountdown) seconds. Cancel to stop.")
+                 : (lang.isSpanish
+                    ? "Tus contactos fueron notificados con tu ubicación."
+                    : "Your trusted contacts have been sent your location."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .background(Color.red.opacity(0.08))
+        .background((smsPending ? Color.orange : Color.red).opacity(0.08))
         .cornerRadius(8)
     }
 
@@ -251,15 +258,12 @@ struct ContentView: View {
     }
 
     private func activateSOS() async {
-        do {
-            try await syncService.insertAlertPing()
-            isSosActive = true
-            sosCountdown = 60
-
-            startCancelWindowTimer()
-        } catch {
-            syncService.lastError = "SOS failed: \(error.localizedDescription)"
-        }
+        // Start 60s countdown — SMS fires AFTER countdown expires, not immediately.
+        // Cancel within 60s = no SMS sent at all.
+        isSosActive = true
+        smsPending = true
+        sosCountdown = 60
+        startCancelWindowTimer()
     }
 
     private func startCancelWindowTimer() {
@@ -267,24 +271,32 @@ struct ContentView: View {
             if sosCountdown > 0 {
                 sosCountdown -= 1
             } else {
-                resetSOS()
+                // Countdown expired — now fire the alert ping and SMS
+                Task { await fireSOS() }
             }
+        }
+    }
+
+    private func fireSOS() async {
+        smsPending = false
+        timer?.invalidate()
+        timer = nil
+        do {
+            try await syncService.insertAlertPing()
+        } catch {
+            syncService.lastError = "SOS failed: \(error.localizedDescription)"
+            resetSOS()
         }
     }
 
     private func cancelSOS() {
-        Task {
-            do {
-                try await syncService.resetAlertPing()
-                resetSOS()
-            } catch {
-                syncService.lastError = "Cancel failed: \(error.localizedDescription)"
-            }
-        }
+        // Cancelled before SMS fired — no ping inserted, no SMS sent
+        resetSOS()
     }
 
     private func resetSOS() {
         isSosActive = false
+        smsPending = false
         sosCountdown = 60
         sosStartTime = nil
         timer?.invalidate()
