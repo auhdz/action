@@ -30,8 +30,8 @@ Publish at `accion.app/privacy`. Link from the app Settings screen and enter the
 ```markdown
 # Acción Privacy Policy
 
-**Effective Date:** [INSERT DATE]
-**Last Updated:** [INSERT DATE]
+**Effective Date:** May 2, 2026
+**Last Updated:** May 2, 2026
 
 ## 1. Overview
 
@@ -226,7 +226,7 @@ For privacy questions or to request your data:
 We will respond to privacy requests within 30 days.
 
 ---
-**Effective Date:** [DATE] | **Last Updated:** [DATE]
+**Effective Date:** May 2, 2026 | **Last Updated:** May 2, 2026
 ```
 
 ---
@@ -238,8 +238,8 @@ Publish at `accion.app/terms`. Link from the app Settings screen.
 ```markdown
 # Acción Terms of Service
 
-**Effective Date:** [INSERT DATE]
-**Last Updated:** [INSERT DATE]
+**Effective Date:** May 2, 2026
+**Last Updated:** May 2, 2026
 
 ## 1. Agreement to Terms
 
@@ -440,7 +440,7 @@ United States**, without regard to its conflict of law principles.
 **Mailing Address:** [YOUR ADDRESS]
 
 ---
-**Effective Date:** [DATE]
+**Effective Date:** May 2, 2026
 ```
 
 ---
