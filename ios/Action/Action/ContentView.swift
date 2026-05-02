@@ -127,21 +127,6 @@ struct ContentView: View {
                 }
             }
 
-            Button(action: {
-                Task { await activateSOS() }
-            }) {
-                Text(lang.isSpanish
-                     ? "Estoy siendo detenido — alertar a mis contactos"
-                     : "I am being detained — alert my contacts")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: 44)
-                    .background(Color.actionRed)
-                    .cornerRadius(8)
-            }
-
             Text(lang.isSpanish
                  ? "Fuente: CHIRLA — chirla.org · Línea de ayuda: 888-624-4752"
                  : "Source: CHIRLA — chirla.org · Hotline: 888-624-4752")
