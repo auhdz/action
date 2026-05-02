@@ -17,7 +17,27 @@
       "Bash(xcodebuild *)",
       "Bash(xcrun simctl *)",
       "Bash(xcrun swiftc *)",
-      "Bash(awk '{print $NF}')"
+      "Bash(awk '{print $NF}')",
+      "Bash(gh api *)",
+      "Bash(git filter-branch -f --env-filter ' *)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(cp /Users/ahernandez5/Downloads/legalwordingAction/accion-twilio-sms-wording.md /Users/ahernandez5/action/docs/legal/)",
+      "Bash(cp /Users/ahernandez5/Downloads/legalwordingAction/accion-community-feed-wording.md /Users/ahernandez5/action/docs/legal/)",
+      "Bash(cp /Users/ahernandez5/Downloads/legalwordingAction/accion-appstore-wording.md /Users/ahernandez5/action/docs/legal/)",
+      "Bash(cp /Users/ahernandez5/Downloads/legalwordingAction/accion-legal-tos-wording.md /Users/ahernandez5/action/docs/legal/)",
+      "WebSearch",
+      "WebFetch(domain:www.chirla.org)",
+      "WebFetch(domain:www.ilrc.org)",
+      "WebFetch(domain:oia.lacounty.gov)",
+      "Bash(python3 *)",
+      "Bash(open *)",
+      "Bash(npx create-next-app@14 *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(git *)"
     ]
   }
 }

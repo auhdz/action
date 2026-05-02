@@ -20,47 +20,52 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            Color.safeCream
-                .ignoresSafeArea()
+            Color.safeCream.ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 14) {
-                // Title row with language toggle
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Acción")
-                            .font(.system(size: 30, weight: .semibold))
-                            .foregroundStyle(Color.trustNavy)
-                        Text(timeBasedGreeting)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+            VStack(spacing: 0) {
+                // Scrollable content — title + cards
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(alignment: .firstTextBaseline) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Acción")
+                                    .font(.system(size: 30, weight: .semibold))
+                                    .foregroundStyle(Color.trustNavy)
+                                Text(timeBasedGreeting)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            LanguageToggle()
+                        }
+
+                        if isSosActive && smsPending {
+                            sosPendingCard
+                        } else if isSosActive && !smsPending {
+                            sosSentCard
+                        } else {
+                            safetyStatusCard
+                        }
+
+                        kyrCard
                     }
-                    Spacer()
-                    LanguageToggle()
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 12)
                 }
 
-                // Safety status card or SOS states
-                if isSosActive && smsPending {
-                    sosPendingCard
-                } else if isSosActive && !smsPending {
-                    sosSentCard
-                } else {
-                    safetyStatusCard
+                // EMERGENCIA button pinned at bottom — hidden during active SOS
+                if !isSosActive {
+                    sosGestureButton
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
+                        .padding(.bottom, 24)
+                        .background(Color.safeCream)
                 }
-
-                // Know Your Rights — Cards Against Humanity style
-                kyrCard
-
-                Spacer(minLength: 0)
-
-                sosButton
-                    .padding(.bottom, 24)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .padding(.horizontal, 24)
-            .padding(.top, 16)
-            .onAppear {
-                locationManager.requestAuthorizationIfNeeded()
-            }
+        }
+        .onAppear {
+            locationManager.requestAuthorizationIfNeeded()
         }
     }
 
@@ -240,96 +245,108 @@ struct ContentView: View {
     // MARK: - SOS Pending Card (countdown with cancel)
 
     private var sosPendingCard: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             ZStack {
                 Circle()
-                    .stroke(Color.white.opacity(0.12), lineWidth: 7)
-                    .frame(width: 96, height: 96)
+                    .stroke(Color.white.opacity(0.10), lineWidth: 7)
+                    .frame(width: 100, height: 100)
                 Circle()
                     .trim(from: 0, to: CGFloat(sosCountdown) / 60.0)
                     .stroke(
-                        sosCountdown > 20 ? Color.safetyOrange : Color.actionRed,
+                        sosCountdown > 20
+                            ? Color(red: 0.95, green: 0.65, blue: 0.10)
+                            : Color(red: 0.87, green: 0.15, blue: 0.15),
                         style: StrokeStyle(lineWidth: 7, lineCap: .round)
                     )
-                    .frame(width: 96, height: 96)
+                    .frame(width: 100, height: 100)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 1), value: sosCountdown)
                 VStack(spacing: 1) {
                     Text("\(sosCountdown)")
-                        .font(.system(size: 34, weight: .bold))
+                        .font(.system(size: 36, weight: .bold))
                         .foregroundStyle(.white)
                         .contentTransition(.numericText())
                     Text(lang.isSpanish ? "seg." : "sec.")
                         .font(.system(size: 11))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.white.opacity(0.45))
                 }
             }
 
-            VStack(spacing: 5) {
-                Text(lang.isSpanish ? "Enviando alerta…" : "Sending alert…")
-                    .font(.system(size: 16, weight: .semibold))
+            VStack(spacing: 4) {
+                Text(lang.isSpanish ? "Alerta en camino…" : "Alert in progress…")
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
                 Text(lang.isSpanish
-                     ? "Tu ubicación se enviará a tus contactos cuando termine la cuenta regresiva."
-                     : "Your location will be sent to your contacts when the countdown ends.")
+                     ? "Tu ubicación se enviará cuando termine la cuenta regresiva."
+                     : "Your location will be sent when the countdown reaches zero.")
                     .font(.system(size: 12))
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(.white.opacity(0.50))
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Button(action: { Task { await fireSOS() } }) {
+                Text(lang.isSpanish ? "Enviar ahora — acción inmediata" : "Send now — immediate action")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(Color(red: 0.87, green: 0.15, blue: 0.15))
+                    .cornerRadius(10)
             }
 
             Button(action: { cancelSOS() }) {
                 Text(lang.isSpanish ? "Cancelar — estoy bien" : "Cancel — I'm safe")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(Color.white.opacity(0.12))
-                    .cornerRadius(10)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white.opacity(0.55))
             }
         }
-        .padding(20)
-        .background(Color.trustNavy)
+        .padding(22)
+        .background(Color(red: 0.08, green: 0.09, blue: 0.11))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     // MARK: - SOS Sent Confirmation Card
 
     private var sosSentCard: some View {
-        VStack(spacing: 14) {
+        let appleGreen = Color(red: 0.204, green: 0.780, blue: 0.349)
+        return VStack(spacing: 16) {
             ZStack {
                 Circle()
-                    .fill(Color.actionRed.opacity(0.18))
-                    .frame(width: 64, height: 64)
-                Image(systemName: "checkmark")
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundColor(Color.actionRed)
+                    .fill(appleGreen.opacity(0.15))
+                    .frame(width: 72, height: 72)
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 44))
+                    .foregroundColor(appleGreen)
             }
 
             VStack(spacing: 6) {
                 Text(lang.isSpanish ? "Alerta enviada" : "Alert sent")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(Color.trustNavy)
                 Text(lang.isSpanish
-                     ? "Tu ubicación fue enviada a tus contactos. La ayuda está en camino."
-                     : "Your location was sent to your contacts. Help is on the way.")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.white.opacity(0.65))
+                     ? "Tu ubicación fue enviada a tus contactos de confianza. La ayuda está en camino."
+                     : "Your location was sent to your trusted contacts. Help is on the way.")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.trustNavy.opacity(0.65))
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Button(action: { resetSOS() }) {
                 Text(lang.isSpanish ? "Entendido" : "Got it")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                    .background(Color.actionRed)
+                    .frame(height: 48)
+                    .background(appleGreen)
                     .cornerRadius(10)
             }
         }
-        .padding(20)
-        .background(Color.trustNavy)
+        .padding(24)
+        .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 4)
     }
 
     // MARK: - SOS Button

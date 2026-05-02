@@ -1,0 +1,327 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - banner "Main navigation" [ref=e4]:
+      - generic [ref=e6]:
+        - link "Stora home" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "Stora Logo" [ref=e8]
+          - generic [ref=e9]: Stora
+        - navigation "Primary" [ref=e10]:
+          - button "Products" [ref=e11]:
+            - text: Products
+            - img [ref=e12]
+          - link "Pricing" [ref=e14] [cursor=pointer]:
+            - /url: /pricing
+          - link "Use Cases" [ref=e15] [cursor=pointer]:
+            - /url: /use-cases
+          - button "Resources" [ref=e16]:
+            - text: Resources
+            - img [ref=e17]
+        - generic [ref=e19]:
+          - link "Stora on GitHub" [ref=e20] [cursor=pointer]:
+            - /url: https://github.com/storasource
+            - img [ref=e21]
+          - link "Sign in" [ref=e23] [cursor=pointer]:
+            - /url: /login
+          - link "Start free" [ref=e24] [cursor=pointer]:
+            - /url: /login
+    - main [ref=e25]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: FIG 0.1
+            - heading "Ship mobile apps without touching Xcode or Android Studio." [level=1] [ref=e31]:
+              - text: Ship mobile apps without
+              - emphasis [ref=e32]: touching
+              - text: Xcode or Android Studio.
+          - generic [ref=e33]:
+            - link "New — Context Manager, AI App Icons, Build Repair Agent, and Developer Docs" [ref=e34] [cursor=pointer]:
+              - /url: /changelog/2026-03-29-context-manager-and-ai-icons
+              - generic [ref=e36]: New — Context Manager, AI App Icons, Build Repair Agent, and Developer Docs
+              - img [ref=e37]
+            - paragraph [ref=e39]: Agents generate screenshots, ASO, and compliance — then submit to the App Store and Google Play from a GitHub connect.
+            - generic [ref=e40]:
+              - link "Start free" [ref=e41] [cursor=pointer]:
+                - /url: /login
+              - link "Book a demo" [ref=e42] [cursor=pointer]:
+                - /url: /book-demo
+        - img "Stora agent running a compliance sweep on a real iPhone simulator, with the app mirrored live in the right pane" [ref=e46]
+      - generic [ref=e48]:
+        - heading "A new species of mobile release tool.Purpose-built for teams shipping mobile apps at the speed AI writes them." [level=2] [ref=e49]:
+          - text: A new species of mobile
+          - emphasis [ref=e50]: release
+          - text: tool.Purpose-built for teams shipping mobile apps at the speed AI writes them.
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - generic [ref=e53]: FIG 0.2
+            - img [ref=e55]
+            - heading "Built for agents" [level=3] [ref=e71]
+            - paragraph [ref=e72]: Every release step — compliance, screenshots, ASO, submission — runs on agents that can be invoked from CI, chat, or the app.
+          - generic [ref=e73]:
+            - generic [ref=e74]: FIG 0.3
+            - img [ref=e76]
+            - heading "Built for the stores" [level=3] [ref=e86]
+            - paragraph [ref=e87]: Direct App Store Connect and Google Play integration. No Fastlane, no Transporter, no App Store Connect tab stuck open for days.
+          - generic [ref=e88]:
+            - generic [ref=e89]: FIG 0.4
+            - img [ref=e91]
+            - heading "Built for speed" [level=3] [ref=e102]
+            - paragraph [ref=e103]: From a GitHub connect to a submitted release in under an hour. Every artifact — screenshots, listing copy, compliance report — cached and reusable.
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - generic [ref=e108]: FIG 1.0
+          - heading "Agents that ship for you." [level=2] [ref=e109]:
+            - text: Agents that ship
+            - emphasis [ref=e110]: for
+            - text: you.
+          - paragraph [ref=e111]: Compliance, screenshots, ASO, and submission — each agent owns one job, each leaves an audit trail, all invokable from CI or chat.
+          - list [ref=e112]:
+            - listitem [ref=e113]:
+              - generic [ref=e115]: Compliance, screenshot, ASO, and submission agents
+            - listitem [ref=e116]:
+              - generic [ref=e118]: Activity feed for every action and decision
+            - listitem [ref=e119]:
+              - generic [ref=e121]: Invokable from GitHub Actions, Slack, or MCP
+          - link "Learn more" [ref=e122] [cursor=pointer]:
+            - /url: /products/agents
+            - text: Learn more
+            - img [ref=e123]
+        - 'img "Stora task composer: one prompt to spin up a full release, with quick-task chips for capture, QA sweep, compliance, and full sweep" [ref=e127]'
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - generic [ref=e132]: FIG 1.1
+          - heading "Screenshots without a camera." [level=2] [ref=e133]:
+            - text: Screenshots without a
+            - emphasis [ref=e134]: camera
+            - text: .
+          - paragraph [ref=e135]: Real-device captures in every locale and device class, rendered with your app running — not mocked.
+          - list [ref=e136]:
+            - listitem [ref=e137]:
+              - generic [ref=e139]: Real-simulator captures across iPhone, iPad, and Android
+            - listitem [ref=e140]:
+              - generic [ref=e142]: Every locale and device class in one run
+            - listitem [ref=e143]:
+              - generic [ref=e145]: Annotated, framed, and App-Store-ready
+          - link "Learn more" [ref=e146] [cursor=pointer]:
+            - /url: /products/screenshots
+            - text: Learn more
+            - img [ref=e147]
+        - img "Stora built-in agents panel — Compliance, QA, Screenshot Capture, Screenshot Design, ASO Report, Generate Metadata — each composable into custom variants" [ref=e151]
+      - generic [ref=e154]:
+        - generic [ref=e155]:
+          - generic [ref=e156]: FIG 1.2
+          - heading "Compliance that catches what you miss." [level=2] [ref=e157]:
+            - text: Compliance that catches what you
+            - emphasis [ref=e158]: miss
+            - text: .
+          - paragraph [ref=e159]: 40+ automated App Store and Play rules run before every submission, with auto-fix PRs for anything that fails.
+          - list [ref=e160]:
+            - listitem [ref=e161]:
+              - generic [ref=e163]: 40+ App Store Review Guidelines encoded
+            - listitem [ref=e164]:
+              - generic [ref=e166]: Auto-fix PRs for the rules that have one
+            - listitem [ref=e167]:
+              - generic [ref=e169]: Compliance score tracked across releases
+          - link "Learn more" [ref=e170] [cursor=pointer]:
+            - /url: /products/compliance
+            - text: Learn more
+            - img [ref=e171]
+        - img "Compliance readiness view with an 85/100 score, severity breakdown, score-over-time trend, and a scan history with per-run rejection risk" [ref=e175]
+      - generic [ref=e178]:
+        - generic [ref=e179]:
+          - generic [ref=e180]: FIG 1.3
+          - heading "Submissions without App Store Connect." [level=2] [ref=e181]:
+            - text: Submissions without
+            - emphasis [ref=e182]: App Store Connect
+            - text: .
+          - paragraph [ref=e183]: Both stores, one approval. iOS and Android pipelines share a release object — build, sign, review, submit.
+          - list [ref=e184]:
+            - listitem [ref=e185]:
+              - generic [ref=e187]: App Store Connect and Google Play from one release
+            - listitem [ref=e188]:
+              - generic [ref=e190]: TestFlight, Internal, Alpha, Beta, Production tracks
+            - listitem [ref=e191]:
+              - generic [ref=e193]: Status synced back to GitHub and Slack
+          - link "Learn more" [ref=e194] [cursor=pointer]:
+            - /url: /products/submissions
+            - text: Learn more
+            - img [ref=e195]
+        - img "Stora release overview for Versed iOS v1.0 — readiness score, screenshots, listing, compliance, build status, and recent agent runs all on one screen" [ref=e199]
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - heading "From a commit to a release, in three steps." [level=2] [ref=e203]:
+            - text: From a commit to a
+            - emphasis [ref=e204]: release
+            - text: ", in three steps."
+          - img [ref=e206]
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - generic [ref=e219]: "01"
+            - heading "Connect your repo" [level=3] [ref=e220]
+            - paragraph [ref=e221]: One click connects your GitHub repo. Stora finds your iOS and Android projects automatically.
+          - generic [ref=e222]:
+            - generic [ref=e224]: "02"
+            - heading "Agents run the release" [level=3] [ref=e225]
+            - paragraph [ref=e226]: Compliance, screenshots, ASO copy, and submission — each owned by its own agent, each auditable.
+          - generic [ref=e227]:
+            - generic [ref=e229]: "03"
+            - heading "Submit to both stores" [level=3] [ref=e230]
+            - paragraph [ref=e231]: One approval, two submissions. App Store Connect and Google Play updated from the same release.
+      - generic [ref=e233]:
+        - generic [ref=e234]:
+          - generic [ref=e235]:
+            - generic [ref=e236]: FIG 1.4
+            - heading "Latest changes." [level=2] [ref=e237]:
+              - text: Latest
+              - emphasis [ref=e238]: changes
+              - text: .
+          - link "View all changes" [ref=e239] [cursor=pointer]:
+            - /url: /changelog
+            - text: View all changes
+            - img [ref=e240]
+        - list [ref=e242]:
+          - listitem [ref=e243]:
+            - link "Mar 29, 2026 Feature Context Manager, AI App Icons, Build Repair Agent, and Developer Docs Project context manager, AI-generated app icons, automatic build failure repair, API key management, new landing page, and developer documentation." [ref=e244] [cursor=pointer]:
+              - /url: /changelog/2026-03-29-context-manager-and-ai-icons
+              - generic [ref=e245]: Mar 29, 2026
+              - generic [ref=e246]: Feature
+              - generic [ref=e247]:
+                - heading "Context Manager, AI App Icons, Build Repair Agent, and Developer Docs" [level=3] [ref=e248]
+                - paragraph [ref=e249]: Project context manager, AI-generated app icons, automatic build failure repair, API key management, new landing page, and developer documentation.
+          - listitem [ref=e250]:
+            - 'link "Mar 28, 2026 Feature Major Platform Update: MCP Server, REST API, Binary-Only Mode, and More The biggest Stora release yet — MCP server for Claude Code, public REST API, binary uploads without GitHub, magic link auth, compliance v2, and build management." [ref=e251] [cursor=pointer]':
+              - /url: /changelog/2026-03-28-platform-update
+              - generic [ref=e252]: Mar 28, 2026
+              - generic [ref=e253]: Feature
+              - generic [ref=e254]:
+                - 'heading "Major Platform Update: MCP Server, REST API, Binary-Only Mode, and More" [level=3] [ref=e255]'
+                - paragraph [ref=e256]: The biggest Stora release yet — MCP server for Claude Code, public REST API, binary uploads without GitHub, magic link auth, compliance v2, and build management.
+          - listitem [ref=e257]:
+            - link "Mar 27, 2026 Feature App Store Connect Submission Hub End-to-end App Store Connect submission with credential encryption, release wizard, and AI-powered age ratings." [ref=e258] [cursor=pointer]:
+              - /url: /changelog/2026-03-27-asc-submission-hub
+              - generic [ref=e259]: Mar 27, 2026
+              - generic [ref=e260]: Feature
+              - generic [ref=e261]:
+                - heading "App Store Connect Submission Hub" [level=3] [ref=e262]
+                - paragraph [ref=e263]: End-to-end App Store Connect submission with credential encryption, release wizard, and AI-powered age ratings.
+      - generic [ref=e265]:
+        - generic [ref=e266]:
+          - generic [ref=e267]: FIG 2.0
+          - heading "Free to start. Priced like you'd price it yourself." [level=2] [ref=e268]:
+            - text: Free to start.
+            - emphasis [ref=e269]: Priced
+            - text: like you'd price it yourself.
+        - generic [ref=e270]:
+          - generic [ref=e271]: Free1 app · full pipeline · 10K credits
+          - generic [ref=e272]: Starter $19/mo3 apps · 50K credits
+          - generic [ref=e273]: Pro $49/moUnlimited apps · 200K credits
+        - link "See full pricing" [ref=e274] [cursor=pointer]:
+          - /url: /pricing
+          - text: See full pricing
+          - img [ref=e275]
+      - generic [ref=e278]:
+        - heading "Release your next update. Today." [level=2] [ref=e279]:
+          - text: Release your next update.
+          - emphasis [ref=e280]: Today.
+        - generic [ref=e281]:
+          - link "Start free" [ref=e282] [cursor=pointer]:
+            - /url: /login
+          - link "Book a demo" [ref=e283] [cursor=pointer]:
+            - /url: /book-demo
+    - contentinfo [ref=e284]:
+      - generic [ref=e285]:
+        - generic [ref=e286]:
+          - generic [ref=e287]:
+            - link "◎ Stora" [ref=e288] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e289]: ◎
+              - text: Stora
+            - paragraph [ref=e290]: The release pipeline for mobile teams and AI agents.
+          - generic [ref=e291]:
+            - heading "Product" [level=4] [ref=e292]
+            - list [ref=e293]:
+              - listitem [ref=e294]:
+                - link "Screenshots" [ref=e295] [cursor=pointer]:
+                  - /url: /products/screenshots
+              - listitem [ref=e296]:
+                - link "ASO" [ref=e297] [cursor=pointer]:
+                  - /url: /products/aso
+              - listitem [ref=e298]:
+                - link "Compliance" [ref=e299] [cursor=pointer]:
+                  - /url: /products/compliance
+              - listitem [ref=e300]:
+                - link "QA" [ref=e301] [cursor=pointer]:
+                  - /url: /products/qa
+              - listitem [ref=e302]:
+                - link "Submissions" [ref=e303] [cursor=pointer]:
+                  - /url: /products/submissions
+              - listitem [ref=e304]:
+                - link "Builds" [ref=e305] [cursor=pointer]:
+                  - /url: /products/builds
+              - listitem [ref=e306]:
+                - link "Pricing" [ref=e307] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e308]:
+                - link "Security" [ref=e309] [cursor=pointer]:
+                  - /url: /privacy
+          - generic [ref=e310]:
+            - heading "Features" [level=4] [ref=e311]
+            - list [ref=e312]:
+              - listitem [ref=e313]:
+                - link "Agents" [ref=e314] [cursor=pointer]:
+                  - /url: /products/agents
+              - listitem [ref=e315]:
+                - link "Knowledge" [ref=e316] [cursor=pointer]:
+                  - /url: /products/knowledge
+              - listitem [ref=e317]:
+                - link "Developer Tools" [ref=e318] [cursor=pointer]:
+                  - /url: /products/developer-tools
+              - listitem [ref=e319]:
+                - link "MCP" [ref=e320] [cursor=pointer]:
+                  - /url: /products/mcp
+              - listitem [ref=e321]:
+                - link "Integrations" [ref=e322] [cursor=pointer]:
+                  - /url: /integrations
+              - listitem [ref=e323]:
+                - link "Changelog" [ref=e324] [cursor=pointer]:
+                  - /url: /changelog
+          - generic [ref=e325]:
+            - heading "Company" [level=4] [ref=e326]
+            - list [ref=e327]:
+              - listitem [ref=e328]:
+                - link "About" [ref=e329] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e330]:
+                - link "Why Stora" [ref=e331] [cursor=pointer]:
+                  - /url: /why-stora
+              - listitem [ref=e332]:
+                - link "Use Cases" [ref=e333] [cursor=pointer]:
+                  - /url: /use-cases/indie-developers
+          - generic [ref=e334]:
+            - heading "Resources" [level=4] [ref=e335]
+            - list [ref=e336]:
+              - listitem [ref=e337]:
+                - link "Docs" [ref=e338] [cursor=pointer]:
+                  - /url: /docs
+              - listitem [ref=e339]:
+                - link "Blog" [ref=e340] [cursor=pointer]:
+                  - /url: /blog
+          - generic [ref=e341]:
+            - heading "Connect" [level=4] [ref=e342]
+            - list [ref=e343]:
+              - listitem [ref=e344]:
+                - link "X (Twitter)" [ref=e345] [cursor=pointer]:
+                  - /url: https://x.com/storash
+              - listitem [ref=e346]:
+                - link "GitHub" [ref=e347] [cursor=pointer]:
+                  - /url: https://github.com/storasource
+        - generic [ref=e348]:
+          - generic [ref=e349]: © 2026 Stora
+          - generic [ref=e350]:
+            - link "Privacy" [ref=e351] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms" [ref=e352] [cursor=pointer]:
+              - /url: /terms
+  - alert [ref=e353]
