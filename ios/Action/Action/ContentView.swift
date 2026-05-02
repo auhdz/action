@@ -25,11 +25,11 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 // Scrollable content — title + cards
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 16) {
                         HStack(alignment: .firstTextBaseline) {
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 3) {
                                 Text("Acción")
-                                    .font(.system(size: 30, weight: .semibold))
+                                    .font(.system(size: 34, weight: .bold))
                                     .foregroundStyle(Color.trustNavy)
                                 Text(timeBasedGreeting)
                                     .font(.subheadline)
@@ -49,17 +49,17 @@ struct ContentView: View {
 
                         kyrCard
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 16)
-                    .padding(.bottom, 12)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
                 }
 
                 // EMERGENCIA button pinned at bottom — hidden during active SOS
                 if !isSosActive {
                     sosGestureButton
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, 16)
                         .padding(.top, 8)
-                        .padding(.bottom, 24)
+                        .padding(.bottom, 32)
                         .background(Color.safeCream)
                 }
             }
@@ -73,13 +73,13 @@ struct ContentView: View {
 
     private var safetyStatusCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Circle()
                         .fill(locationStatusColor)
-                        .frame(width: 8, height: 8)
+                        .frame(width: 9, height: 9)
                     Text(lang.isSpanish ? "Estás protegido" : "You are safe")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.headline)
                         .foregroundStyle(.white)
                     Spacer()
                 }
@@ -90,7 +90,7 @@ struct ContentView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.top, 14)
+            .padding(.top, 16)
             .padding(.bottom, 12)
 
             CornerMapView(
@@ -98,30 +98,30 @@ struct ContentView: View {
                 annotationProvider: annotationProvider
             )
             .frame(maxWidth: .infinity)
-            .frame(height: 130)
+            .frame(height: 145)
         }
         .background(Color.trustNavy)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     // MARK: - Know Your Rights Card (Cards Against Humanity style)
 
     private var kyrCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 6) {
                 Image(systemName: "shield.fill")
-                    .font(.system(size: 11))
-                    .foregroundColor(.white.opacity(0.7))
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.white.opacity(0.6))
                 Text(lang.isSpanish ? "TUS DERECHOS" : "KNOW YOUR RIGHTS")
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.7))
-                    .tracking(1.5)
+                    .foregroundStyle(.white.opacity(0.6))
+                    .tracking(2)
                 Spacer()
             }
 
             kyrScenarioPicker
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 14) {
                 ForEach(kyrItems, id: \.phrase) { item in
                     KYRItem(phrase: item.phrase, detail: item.detail)
                 }
@@ -130,36 +130,36 @@ struct ContentView: View {
             Text(lang.isSpanish
                  ? "Fuente: CHIRLA — chirla.org · Línea de ayuda: 888-624-4752"
                  : "Source: CHIRLA — chirla.org · Hotline: 888-624-4752")
-                .font(.system(size: 10))
-                .foregroundStyle(.white.opacity(0.3))
+                .font(.caption2)
+                .foregroundStyle(.white.opacity(0.25))
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(16)
         .background(Color(red: 0.07, green: 0.07, blue: 0.07))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var kyrScenarioPicker: some View {
         HStack(spacing: 0) {
             ForEach(KYRScenario.allCases, id: \.self) { scenario in
                 Button(action: { kyrScenario = scenario }) {
-                    HStack(spacing: 4) {
+                    HStack(spacing: 5) {
                         Image(systemName: scenario.icon)
-                            .font(.system(size: 11))
+                            .font(.system(size: 12, weight: .medium))
                         Text(scenario.label(isSpanish: lang.isSpanish))
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 13, weight: .semibold))
                     }
                     .foregroundColor(kyrScenario == scenario ? Color(red: 0.07, green: 0.07, blue: 0.07) : .white.opacity(0.5))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 32)
+                    .frame(height: 36)
                     .background(kyrScenario == scenario ? Color.white : Color.clear)
-                    .cornerRadius(6)
+                    .cornerRadius(8)
                 }
             }
         }
-        .padding(3)
+        .padding(4)
         .background(Color.white.opacity(0.08))
-        .cornerRadius(8)
+        .cornerRadius(10)
     }
 
     private var kyrItems: [(phrase: String, detail: String)] {
@@ -277,7 +277,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
                     .background(Color(red: 0.87, green: 0.15, blue: 0.15))
-                    .cornerRadius(10)
+                    .cornerRadius(12)
             }
 
             Button(action: { cancelSOS() }) {
@@ -288,7 +288,7 @@ struct ContentView: View {
         }
         .padding(22)
         .background(Color(red: 0.08, green: 0.09, blue: 0.11))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     // MARK: - SOS Sent Confirmation Card
@@ -325,13 +325,13 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
                     .background(appleGreen)
-                    .cornerRadius(10)
+                    .cornerRadius(12)
             }
         }
         .padding(24)
         .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 4)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .shadow(color: Color.black.opacity(0.07), radius: 16, x: 0, y: 4)
     }
 
     // MARK: - SOS Button
@@ -374,34 +374,35 @@ struct ContentView: View {
             }
 
         return ZStack(alignment: .center) {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 14)
                 .fill(Color.actionRed)
 
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.actionRed.opacity(0.3), lineWidth: 4)
-                .scaleEffect(1 + sosHoldProgress * 0.1)
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.actionRed.opacity(0.35), lineWidth: 5)
+                .scaleEffect(1 + sosHoldProgress * 0.08)
                 .opacity(1 - sosHoldProgress)
 
-            VStack(spacing: 6) {
+            VStack(spacing: 5) {
                 Text("EMERGENCIA")
-                    .font(.system(size: 16, weight: .bold, design: .default))
+                    .font(.system(size: 17, weight: .bold))
+                    .tracking(-0.3)
                     .foregroundStyle(.white)
 
                 if sosHoldProgress > 0 {
                     Text(lang.isSpanish ? "Alertando contactos…" : "Alerting contacts…")
-                        .font(.caption.weight(.medium))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(.white.opacity(0.9))
                 } else {
                     Text(lang.isSpanish
                          ? "Mantén 3s para alertar tus contactos"
                          : "Hold 3s to alert your trusted contacts")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.75))
+                        .font(.system(size: 13))
+                        .foregroundStyle(.white.opacity(0.72))
                 }
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 56)
+        .frame(height: 60)
         .gesture(gesture)
     }
 
@@ -539,17 +540,17 @@ private struct KYRItem: View {
     let detail: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: 12) {
             Text("—")
-                .font(.system(size: 14, weight: .bold))
+                .font(.system(size: 15, weight: .bold))
                 .foregroundStyle(Color.actionRed)
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(phrase)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(detail)
-                    .font(.system(size: 12))
+                    .font(.footnote)
                     .foregroundStyle(.white.opacity(0.5))
                     .fixedSize(horizontal: false, vertical: true)
             }
