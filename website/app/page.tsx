@@ -6,6 +6,7 @@ import FeatureSection from '@/components/FeatureSection'
 import HowItWorks from '@/components/HowItWorks'
 import WhatsNew from '@/components/WhatsNew'
 import Pricing from '@/components/Pricing'
+import FuturePlans from '@/components/FuturePlans'
 import FinalCTA from '@/components/FinalCTA'
 import Footer from '@/components/Footer'
 
@@ -47,6 +48,7 @@ export default function Home() {
       <HowItWorks />
       <WhatsNew />
       <Pricing />
+      <FuturePlans />
       <FinalCTA />
       <Footer />
     </main>

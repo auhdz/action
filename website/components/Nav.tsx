@@ -7,6 +7,7 @@ const links = [
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Pricing', href: '#pricing' },
+  { label: 'Future Plans', href: '#future-plans' },
 ]
 
 export default function Nav() {
