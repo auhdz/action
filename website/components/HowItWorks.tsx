@@ -8,11 +8,11 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 border-t border-white/8">
+    <section id="how-it-works" className="py-28">
       <div className="max-w-6xl mx-auto px-6">
         <FadeUp>
           <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">Setup</p>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-cream mb-16">
+          <h2 className="font-display font-bold text-4xl md:text-5xl text-cream mb-16 tracking-tight">
             Three steps. That&apos;s <em className="font-serif not-italic">it.</em>
           </h2>
         </FadeUp>

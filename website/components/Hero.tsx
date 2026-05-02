@@ -11,14 +11,12 @@ export default function Hero() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#F39A1E]/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="flex flex-col gap-6">
-          <motion.div variants={fadeUp}>
-            <span className="font-mono text-xs text-muted tracking-widest uppercase">FIG 0.1</span>
-          </motion.div>
+      <div className="max-w-6xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="flex flex-col gap-8">
           <motion.h1
             variants={fadeUp}
-            className="font-display font-bold text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-cream"
+            className="font-display font-bold text-5xl md:text-6xl lg:text-7xl text-cream"
+            style={{ lineHeight: '1.08', letterSpacing: '-0.02em' }}
           >
             Keep your family safe without{' '}
             <em className="font-serif not-italic">giving anything</em>{' '}
@@ -26,11 +24,11 @@ export default function Hero() {
           </motion.h1>
         </motion.div>
 
-        <motion.div variants={stagger} initial="hidden" animate="visible" className="flex flex-col gap-6">
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="flex flex-col gap-7">
           <motion.div variants={fadeUp} className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-orange animate-pulse" />
             <span className="text-sm text-muted font-sans">
-              New — Bilingual support + Know Your Rights card
+              New: Bilingual support + Know Your Rights card
             </span>
             <span className="text-muted/40">→</span>
           </motion.div>
@@ -57,7 +55,7 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pb-20">
+      <div className="max-w-6xl mx-auto px-6 pb-24">
         <motion.div
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}

@@ -5,7 +5,6 @@ import type { ComponentProps } from 'react'
 type MockupVariant = ComponentProps<typeof PhoneMockup>['variant']
 
 interface FeatureSectionProps {
-  fig: string
   headline: React.ReactNode
   body: string
   variant: MockupVariant
@@ -14,7 +13,6 @@ interface FeatureSectionProps {
 }
 
 export default function FeatureSection({
-  fig,
   headline,
   body,
   variant,
@@ -22,7 +20,7 @@ export default function FeatureSection({
   glow,
 }: FeatureSectionProps) {
   return (
-    <section className="py-24 border-t border-white/8 relative overflow-hidden">
+    <section className="py-28 relative overflow-hidden">
       {glow && (
         <div
           className="absolute inset-0 pointer-events-none"
@@ -34,16 +32,13 @@ export default function FeatureSection({
           flip ? 'lg:[&>*:first-child]:order-2' : ''
         }`}
       >
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           <FadeUp>
-            <span className="font-mono text-xs text-muted uppercase tracking-widest">{fig}</span>
-          </FadeUp>
-          <FadeUp delay={0.05}>
-            <h2 className="font-display font-bold text-4xl md:text-5xl text-cream leading-tight">
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-cream leading-tight tracking-tight">
               {headline}
             </h2>
           </FadeUp>
-          <FadeUp delay={0.1}>
+          <FadeUp delay={0.08}>
             <p className="text-lg text-muted font-sans leading-relaxed">{body}</p>
           </FadeUp>
         </div>

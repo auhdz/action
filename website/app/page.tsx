@@ -18,14 +18,12 @@ export default function Home() {
       <FeaturePillars />
 
       <FeatureSection
-        fig="FIG 1.1"
         headline={<>Your family always knows <em className="font-serif not-italic">where</em> you are.</>}
-        body="Acción syncs your GPS location to trusted contacts in real time. They see your exact position on a live map — no app download needed."
+        body="Acción syncs your GPS location to trusted contacts in real time. They see your exact position on a live map. No app download needed."
         variant="map"
       />
 
       <FeatureSection
-        fig="FIG 1.2"
         headline={<>One hold. Help is <em className="font-serif not-italic">on the way.</em></>}
         body="Press and hold 3 seconds. Acción sends an SMS to your trusted contacts with a secure web link to your live location. A 60-second cancel window gives you control."
         variant="sos"
@@ -34,14 +32,12 @@ export default function Home() {
       />
 
       <FeatureSection
-        fig="FIG 1.3"
         headline={<>Know your rights in <em className="font-serif not-italic">any</em> situation.</>}
-        body="CHIRLA and ILRC-verified legal language. What to say, what to do — available in English and Spanish, always inside the app."
+        body="CHIRLA and ILRC-verified legal language. What to say, what to do. Available in English and Spanish, always inside the app."
         variant="kyr"
       />
 
       <FeatureSection
-        fig="FIG 2.0"
         headline={<>Family sees you. No app <em className="font-serif not-italic">required.</em></>}
         body="When you share your location, your contacts get a link. They open it in any browser and see your real-time position. Nothing to install."
         variant="web"

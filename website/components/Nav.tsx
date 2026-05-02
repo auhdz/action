@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 const links = [
   { label: 'Features', href: '#features' },
@@ -27,12 +28,8 @@ export default function Nav() {
       }}
     >
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-2 font-display font-bold text-cream text-lg">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M10 2L18 7V13L10 18L2 13V7L10 2Z" stroke="currentColor" strokeWidth="1.5" fill="none" />
-            <circle cx="10" cy="10" r="2.5" fill="var(--color-orange)" />
-          </svg>
-          Acción
+        <a href="/" className="flex items-center">
+          <Image src="/logo.png" alt="Acción" height={32} width={120} className="object-contain object-left" priority />
         </a>
 
         <div className="hidden md:flex items-center gap-8">

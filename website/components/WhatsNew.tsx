@@ -11,7 +11,7 @@ const updates = [
     version: 'v1.1',
     date: 'Mar 2026',
     title: 'SOS flow updated',
-    body: '60-second cancel window before SMS sends — giving you full control after holding the button.',
+    body: '60-second cancel window before SMS sends, giving you full control after holding the button.',
   },
   {
     version: 'v1.0',
@@ -23,10 +23,10 @@ const updates = [
 
 export default function WhatsNew() {
   return (
-    <section className="py-24 border-t border-white/8">
+    <section className="py-28">
       <div className="max-w-6xl mx-auto px-6">
         <FadeUp>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-cream mb-12">
+          <h2 className="font-display font-bold text-4xl md:text-5xl text-cream mb-12 tracking-tight">
             What&apos;s <em className="font-serif not-italic">new</em>
           </h2>
         </FadeUp>

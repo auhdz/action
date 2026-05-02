@@ -33,7 +33,7 @@ const columns = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/8 pt-16 pb-8">
+    <footer className="pt-20 pb-10">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
           {columns.map((col) => (
@@ -51,7 +51,7 @@ export default function Footer() {
             </div>
           ))}
         </div>
-        <div className="border-t border-white/8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-sans text-muted">
+        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-sans text-muted/50">
           <p>© 2026 Acción. Built for the community.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-cream transition-colors">Privacy</a>

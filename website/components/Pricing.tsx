@@ -11,10 +11,10 @@ const features = [
 
 export default function Pricing() {
   return (
-    <section id="privacy" className="py-24 border-t border-white/8">
+    <section id="privacy" className="py-28">
       <div className="max-w-6xl mx-auto px-6">
         <FadeUp>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-cream mb-12 text-center">
+          <h2 className="font-display font-bold text-4xl md:text-5xl text-cream mb-12 text-center tracking-tight">
             Free. <em className="font-serif not-italic">Always.</em>
           </h2>
         </FadeUp>
