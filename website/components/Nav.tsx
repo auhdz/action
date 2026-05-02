@@ -6,7 +6,7 @@ import Image from 'next/image'
 const links = [
   { label: 'Features', href: '#features' },
   { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Privacy', href: '#privacy' },
+  { label: 'Pricing', href: '#pricing' },
 ]
 
 export default function Nav() {
