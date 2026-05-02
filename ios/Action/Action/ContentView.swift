@@ -7,16 +7,13 @@ struct ContentView: View {
 
     @AppStorage("userName") private var userName = ""
 
-    @State private var sosStartTime: Date?
     @State private var isSosActive = false
     @State private var sosCountdown: Int = 60
-    @State private var sosHoldProgress: Double = 0
     @State private var timer: Timer?
     @State private var smsPending = false
     @State private var kyrScenario: KYRScenario = .street
 
     private let annotationProvider: MapAnnotationProviding = EmptyMapAnnotationProvider()
-    private let sosHoldDuration: Double = 3.0
 
     var body: some View {
         ZStack {
@@ -334,76 +331,24 @@ struct ContentView: View {
         .shadow(color: Color.black.opacity(0.07), radius: 16, x: 0, y: 4)
     }
 
-    // MARK: - SOS Button
-
-    private var sosButton: some View {
-        VStack(spacing: 16) {
-            if isSosActive {
-                Button(action: { cancelSOS() }) {
-                    Text(lang.isSpanish ? "Cancelar alerta" : "Cancel Alert")
-                        .font(.system(size: 16, weight: .semibold, design: .default))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color.actionRed)
-                        .foregroundStyle(.white)
-                        .cornerRadius(12)
-                }
-            } else {
-                sosGestureButton
-            }
-        }
-    }
-
     private var sosGestureButton: some View {
-        let gesture = LongPressGesture(minimumDuration: sosHoldDuration)
-            .onChanged { isPressing in
-                if isPressing {
-                    if sosStartTime == nil {
-                        sosStartTime = Date()
-                        startHoldAnimation()
-                    }
-                } else {
-                    resetHoldState()
-                }
-            }
-            .onEnded { success in
-                if success {
-                    Task { await activateSOS() }
-                }
-                resetHoldState()
-            }
-
-        return ZStack(alignment: .center) {
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.actionRed)
-
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(Color.actionRed.opacity(0.35), lineWidth: 5)
-                .scaleEffect(1 + sosHoldProgress * 0.08)
-                .opacity(1 - sosHoldProgress)
-
+        Button(action: { Task { await activateSOS() } }) {
             VStack(spacing: 5) {
-                Text("EMERGENCIA")
+                Text(lang.isSpanish ? "EMERGENCIA" : "EMERGENCY")
                     .font(.system(size: 17, weight: .bold))
                     .tracking(-0.3)
                     .foregroundStyle(.white)
-
-                if sosHoldProgress > 0 {
-                    Text(lang.isSpanish ? "Alertando contactos…" : "Alerting contacts…")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.9))
-                } else {
-                    Text(lang.isSpanish
-                         ? "Mantén 3s para alertar tus contactos"
-                         : "Hold 3s to alert your trusted contacts")
-                        .font(.system(size: 13))
-                        .foregroundStyle(.white.opacity(0.72))
-                }
+                Text(lang.isSpanish
+                     ? "Toca para alertar a tus contactos"
+                     : "Tap to alert your trusted contacts")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.72))
             }
+            .frame(maxWidth: .infinity)
+            .frame(height: 60)
+            .background(Color.actionRed)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 60)
-        .gesture(gesture)
     }
 
     // MARK: - Computed Properties
@@ -449,25 +394,6 @@ struct ContentView: View {
 
     // MARK: - SOS Logic
 
-    private func startHoldAnimation() {
-        var progress: Double = 0
-        timer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { _ in
-            progress += (0.016 / sosHoldDuration)
-            sosHoldProgress = min(progress, 1.0)
-            if sosHoldProgress >= 1.0 {
-                timer?.invalidate()
-                timer = nil
-            }
-        }
-    }
-
-    private func resetHoldState() {
-        sosStartTime = nil
-        sosHoldProgress = 0
-        timer?.invalidate()
-        timer = nil
-    }
-
     private func activateSOS() async {
         isSosActive = true
         smsPending = true
@@ -505,7 +431,6 @@ struct ContentView: View {
         isSosActive = false
         smsPending = false
         sosCountdown = 60
-        sosStartTime = nil
         timer?.invalidate()
         timer = nil
     }
