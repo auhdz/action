@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { sora, inter, instrumentSerif } from '@/lib/fonts'
+import SmoothScrollProvider from '@/components/SmoothScrollProvider'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -18,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${sora.variable} ${inter.variable} ${instrumentSerif.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+      </body>
     </html>
   )
 }
